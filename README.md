@@ -87,6 +87,7 @@ docker run -d \
   -p 3000:3001 \
   -p 7777:7777 \
   -p 8000:8000 \
+  -p 8001:8001 \
   -p 8888:8888 \
   -e JUPYTER_PASSWORD=Jup1t3R! \
   -e EXTRA_ARGS=--lowvram --disable-xformers \
@@ -102,6 +103,7 @@ You can obviously substitute the image name and tag with your own.
 | 3000         | 3001          | ComfyUI              |
 | 7777         | 7777          | Code Server          |
 | 8000         | 8000          | Application Manager  |
+| 8001         | 8001          | FastAPI              |
 | 8888         | 8888          | Jupyter Lab          |
 | 2999         | 2999          | RunPod File Uploader |
 
@@ -122,6 +124,7 @@ killing the service to view the logs
 | Application | Log file                    |
 |-------------|-----------------------------|
 | ComfyUI     | /workspace/logs/comfyui.log |
+| FastAPI     | /workspace/logs/fastapi.log |
 
 ## Community and Contributing
 

@@ -24,6 +24,13 @@ pip install setuptools --upgrade
 git clone https://github.com/ltdrdata/ComfyUI-Manager.git custom_nodes/ComfyUI-Manager
 cd custom_nodes/ComfyUI-Manager
 pip3 install -r requirements.txt
+
+# Install ComfyUI-FastAPI
+cd /ComfyUI
+git clone https://github.com/hzeyuan/comfyui-fastapi.git 
+cd comfyui-fastapi
+pip3 install -r requirements.txt
+
 pip3 cache purge
 
 # Fix some incorrect modules

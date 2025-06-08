@@ -143,6 +143,9 @@ fi
 cd /app-manager
 npm start > /workspace/logs/app-manager.log 2>&1 &
 
+# Start FastAPI service
+/start_fastapi.sh
+
 if [[ ${DISABLE_AUTOLAUNCH} ]]
 then
     echo "Auto launching is disabled so the applications will not be started automatically"
@@ -159,3 +162,5 @@ else
 
     /start_comfyui.sh "${ARGS[@]}"
 fi
+
+echo "Pre-start initialization completed"

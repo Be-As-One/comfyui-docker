@@ -1,5 +1,6 @@
 {
   "applications": [
-    "ComfyUI"
+    "ComfyUI",
+    "FastAPI"
   ]
 }
