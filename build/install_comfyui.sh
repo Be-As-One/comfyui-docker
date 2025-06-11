@@ -73,4 +73,6 @@ pip3 cache purge
 
 # Fix some incorrect modules
 pip3 install numpy==1.26.4
+cd /ComfyUI
+pip3 install -r requirements.txt
 deactivate
