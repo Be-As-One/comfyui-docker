@@ -2,9 +2,15 @@
 set -e
 
 # Clone the repo
-git clone https://github.com/comfyanonymous/ComfyUI.git /ComfyUI
-cd /ComfyUI
-git checkout ${COMFYUI_VERSION}
+if [ ! -d "/ComfyUI/.git" ]; then
+  echo "Cloning ComfyUI..."
+  git clone https://github.com/comfyanonymous/ComfyUI.git /ComfyUI
+  cd /ComfyUI
+  git checkout ${COMFYUI_VERSION}
+else
+  echo "ComfyUI already exists, skipping clone."
+  cd /ComfyUI
+fi
 
 # Create and activate the venv
 python3 -m venv --system-site-packages venv
