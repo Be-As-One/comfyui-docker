@@ -11,7 +11,7 @@ variable "APP" {
 }
 
 variable "RELEASE" {
-    default = "v0.3.40-fastapi"
+    default = "v0.3.40-fastapi-v0.0.1"
 }
 
 variable "BASE_IMAGE_REPOSITORY" {
@@ -44,7 +44,7 @@ target "cu124-py311" {
         INDEX_URL                  = "https://download.pytorch.org/whl/cu124"
         TORCH_VERSION              = "2.6.0+cu124"
         XFORMERS_VERSION           = "0.0.29.post3"
-        COMFYUI_VERSION            = "${RELEASE}"
+        COMFYUI_COMMIT             = "${RELEASE}"
         APP_MANAGER_VERSION        = "1.2.2"
         CIVITAI_DOWNLOADER_VERSION = "2.1.0"
     }
@@ -60,7 +60,7 @@ target "cu124-py312" {
         INDEX_URL                  = "https://download.pytorch.org/whl/cu124"
         TORCH_VERSION              = "2.6.0+cu124"
         XFORMERS_VERSION           = "0.0.29.post3"
-        COMFYUI_VERSION            = "${RELEASE}"
+        COMFYUI_COMMIT             = "${RELEASE}"
         APP_MANAGER_VERSION        = "1.2.2"
         CIVITAI_DOWNLOADER_VERSION = "2.1.0"
     }
@@ -76,7 +76,7 @@ target "cu128-py311" {
         INDEX_URL                  = "https://download.pytorch.org/whl/cu128"
         TORCH_VERSION              = "2.7.0+cu128"
         XFORMERS_VERSION           = "0.0.30"
-        COMFYUI_VERSION            = "${RELEASE}"
+        COMFYUI_COMMIT             = "${RELEASE}"
         APP_MANAGER_VERSION        = "1.2.2"
         CIVITAI_DOWNLOADER_VERSION = "2.1.0"
     }
@@ -92,7 +92,7 @@ target "cu128-py312" {
         INDEX_URL                  = "https://download.pytorch.org/whl/cu128"
         TORCH_VERSION              = "2.7.0+cu128"
         XFORMERS_VERSION           = "0.0.30"
-        COMFYUI_VERSION            = "${RELEASE}"
+        COMFYUI_COMMIT             = "${RELEASE}"
         APP_MANAGER_VERSION        = "1.2.2"
         CIVITAI_DOWNLOADER_VERSION = "2.1.0"
     }
