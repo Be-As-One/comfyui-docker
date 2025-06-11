@@ -42,13 +42,14 @@ sync_directory() {
 
     echo "SYNC: Syncing from ${src_dir} to ${dst_dir}, please wait (this can take a few minutes)..."
 
-    # Ensure destination directory exists
+    # 确保目标目录存在
     mkdir -p "${dst_dir}"
 
-    # Check whether /workspace is fuse, overlay, or xfs
+    # 检查 /workspace 所在的文件系统类型
     local workspace_fs=$(df -T /workspace | awk 'NR==2 {print $2}')
     echo "SYNC: File system type: ${workspace_fs}"
 
+    # 使用 tar 进行同步（主要用于 fuse 文件系统，例如 RunPod 上挂载的网络卷）
     if [ "${workspace_fs}" = "fuse" ]; then
         if [ "$use_compression" = true ]; then
             echo "SYNC: Using tar with zstd compression for sync"
@@ -56,13 +57,15 @@ sync_directory() {
             echo "SYNC: Using tar without compression for sync"
         fi
 
-        # Get total size of source directory
+        # 计算源目录总大小（用于进度条显示）
         local total_size=$(du -sb "${src_dir}" | cut -f1)
 
-        # Base tar command with optimizations
+        # 构建 tar 命令（排除 pyc、log、自定义节点和模型目录）
         local tar_cmd="tar --create \
             --file=- \
             --directory="${src_dir}" \
+            --exclude='custom_nodes' \
+            --exclude='models' \
             --exclude='*.pyc' \
             --exclude='__pycache__' \
             --exclude='*.log' \
@@ -71,7 +74,7 @@ sync_directory() {
             --sparse \
             ."
 
-        # Base tar extract command
+        # 构建 tar 解压命令
         local tar_extract_cmd="tar --extract \
             --file=- \
             --directory="${dst_dir}" \
@@ -85,14 +88,22 @@ sync_directory() {
             $tar_cmd | pv -s ${total_size} | $tar_extract_cmd
         fi
 
+    # 使用 rsync 进行同步（更常见的 overlay / xfs 文件系统）
     elif [ "${workspace_fs}" = "overlay" ] || [ "${workspace_fs}" = "xfs" ]; then
-        echo "SYNC: Using rsync for sync"
-        rsync -rlptDu "${src_dir}/" "${dst_dir}/"
+        echo "SYNC: Using rsync for sync (excluding custom_nodes/ and models/)"
+        rsync -rlptDu \
+            --exclude='custom_nodes/' \
+            --exclude='models/' \
+            "${src_dir}/" "${dst_dir}/"
     else
         echo "SYNC: Unknown filesystem type (${workspace_fs}) for /workspace, defaulting to rsync"
-        rsync -rlptDu "${src_dir}/" "${dst_dir}/"
+        rsync -rlptDu \
+            --exclude='custom_nodes/' \
+            --exclude='models/' \
+            "${src_dir}/" "${dst_dir}/"
     fi
 }
+
 
 sync_apps() {
     # Only sync if the DISABLE_SYNC environment variable is not set

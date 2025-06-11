@@ -2,15 +2,9 @@
 set -e
 
 # Clone the repo
-if [ ! -d "/ComfyUI/.git" ]; then
-  echo "Cloning ComfyUI..."
-  git clone https://github.com/comfyanonymous/ComfyUI.git /ComfyUI
-  cd /ComfyUI
-  git checkout ${COMFYUI_VERSION}
-else
-  echo "ComfyUI already exists, skipping clone."
-  cd /ComfyUI
-fi
+git clone https://github.com/comfyanonymous/ComfyUI.git /ComfyUI
+cd /ComfyUI
+git checkout ${COMFYUI_VERSION}
 
 # Create and activate the venv
 python3 -m venv --system-site-packages venv
@@ -30,6 +24,9 @@ pip install setuptools --upgrade
 git clone https://github.com/ltdrdata/ComfyUI-Manager.git custom_nodes/ComfyUI-Manager
 cd custom_nodes/ComfyUI-Manager
 pip3 install -r requirements.txt
+
+chmod +x ./undress_custom_nodes.sh
+./undress_custom_nodes.sh
 
 # Install ComfyUI-FastAPI
 cd /ComfyUI
