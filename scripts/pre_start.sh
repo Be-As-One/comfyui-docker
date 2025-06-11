@@ -41,6 +41,7 @@ sync_directory() {
     local use_compression=${3:-false}
 
     echo "SYNC: Syncing from ${src_dir} to ${dst_dir}, please wait (this can take a few minutes)..."
+    echo "SYNC: Note - existing files will NOT be overwritten"
 
     # 确保目标目录存在
     mkdir -p "${dst_dir}"
@@ -52,20 +53,18 @@ sync_directory() {
     # 使用 tar 进行同步（主要用于 fuse 文件系统，例如 RunPod 上挂载的网络卷）
     if [ "${workspace_fs}" = "fuse" ]; then
         if [ "$use_compression" = true ]; then
-            echo "SYNC: Using tar with zstd compression for sync"
+            echo "SYNC: Using tar with zstd compression for sync (skip existing files)"
         else
-            echo "SYNC: Using tar without compression for sync"
+            echo "SYNC: Using tar without compression for sync (skip existing files)"
         fi
 
         # 计算源目录总大小（用于进度条显示）
         local total_size=$(du -sb "${src_dir}" | cut -f1)
 
-        # 构建 tar 命令（排除 pyc、log、自定义节点和模型目录）
+        # 构建 tar 命令（排除临时文件和日志）
         local tar_cmd="tar --create \
             --file=- \
             --directory="${src_dir}" \
-            --exclude='custom_nodes' \
-            --exclude='models' \
             --exclude='*.pyc' \
             --exclude='__pycache__' \
             --exclude='*.log' \
@@ -74,13 +73,14 @@ sync_directory() {
             --sparse \
             ."
 
-        # 构建 tar 解压命令
+        # 构建 tar 解压命令（添加 --skip-old-files 参数不覆盖已存在的文件）
         local tar_extract_cmd="tar --extract \
             --file=- \
             --directory="${dst_dir}" \
             --blocking-factor=64 \
             --record-size=64K \
-            --sparse"
+            --sparse \
+            --skip-old-files"
 
         if [ "$use_compression" = true ]; then
             $tar_cmd | zstd -T0 -1 | pv -s ${total_size} | zstd -d -T0 | $tar_extract_cmd
@@ -90,16 +90,14 @@ sync_directory() {
 
     # 使用 rsync 进行同步（更常见的 overlay / xfs 文件系统）
     elif [ "${workspace_fs}" = "overlay" ] || [ "${workspace_fs}" = "xfs" ]; then
-        echo "SYNC: Using rsync for sync (excluding custom_nodes/ and models/)"
+        echo "SYNC: Using rsync for sync (skip existing files)"
         rsync -rlptDu \
-            --exclude='custom_nodes/' \
-            --exclude='models/' \
+            --ignore-existing \
             "${src_dir}/" "${dst_dir}/"
     else
-        echo "SYNC: Unknown filesystem type (${workspace_fs}) for /workspace, defaulting to rsync"
+        echo "SYNC: Unknown filesystem type (${workspace_fs}) for /workspace, defaulting to rsync (skip existing files)"
         rsync -rlptDu \
-            --exclude='custom_nodes/' \
-            --exclude='models/' \
+            --ignore-existing \
             "${src_dir}/" "${dst_dir}/"
     fi
 }
