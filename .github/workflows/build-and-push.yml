@@ -35,8 +35,61 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Free up disk space
+        run: |
+          echo "=============================================================================="
+          echo "Freeing up disk space on CI system"
+          echo "=============================================================================="
+
+          echo "Disk usage before cleanup:"
+          df -h
+
+          echo "Listing 100 largest packages"
+          dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n | tail -n 100
+
+          echo "Removing large packages"
+          sudo apt-get remove -y '^ghc-8.*' || true
+          sudo apt-get remove -y '^dotnet-.*' || true
+          sudo apt-get remove -y '^llvm-.*' || true
+          sudo apt-get remove -y 'php.*' || true
+          sudo apt-get remove -y azure-cli google-cloud-sdk hhvm google-chrome-stable firefox powershell mono-devel monodoc-http || true
+          sudo apt-get autoremove -y
+          sudo apt-get clean
+
+          echo "Disk usage after package removal:"
+          df -h
+
+          echo "Removing large directories"
+          # The biggest space savers (based on Apache Flink + GitHub community recommendations)
+          sudo rm -rf /opt/hostedtoolcache    # ~10GB
+          sudo rm -rf /usr/share/dotnet/      # ~15GB (Apache Flink approach)
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/share/boost
+          sudo rm -rf /usr/local/graalvm/
+          sudo rm -rf /usr/local/.ghcup/
+          sudo rm -rf /usr/local/share/powershell
+          sudo rm -rf /usr/local/share/chromium
+          sudo rm -rf /usr/local/lib/node_modules
+          sudo rm -rf /usr/share/swift
+          sudo rm -rf /usr/local/julia*
+          sudo rm -rf /usr/share/miniconda
+          sudo rm -rf /usr/local/share/edge_driver
+          sudo rm -rf /usr/local/share/chromedriver-linux64
+          sudo rm -rf /usr/local/share/gecko_driver
+
+          # Remove Docker images and containers
+          docker system prune -af --volumes
+
+          echo "Final disk usage:"
+          df -h
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: |
+            image=moby/buildkit:latest
+            network=host
 
       - name: Check Docker credentials
         run: |
@@ -78,11 +131,29 @@ jobs:
       - name: Build and push Docker images
         env:
           BUILD_TARGET: ${{ steps.target.outputs.BUILD_TARGET }}
+          BUILDKIT_PROGRESS: plain
+          DOCKER_BUILDKIT: 1
         run: |
+          # Set buildx configuration for space optimization
+          docker buildx create --use --driver docker-container --driver-opt network=host --driver-opt env.BUILDKIT_STEP_LOG_MAX_SIZE=10485760
+
+          # Monitor disk space during build
+          echo "Disk space before build:"
+          df -h
+
           if [[ "${BUILD_TARGET}" == "default" ]]; then
-            docker buildx bake -f docker-bake.hcl --push
+            docker buildx bake -f docker-bake.hcl --push \
+              --set "*.cache-from=type=gha" \
+              --set "*.cache-to=type=gha,mode=max"
           elif [[ "${BUILD_TARGET}" == "all" ]]; then
-            docker buildx bake -f docker-bake.hcl all --push
+            docker buildx bake -f docker-bake.hcl all --push \
+              --set "*.cache-from=type=gha" \
+              --set "*.cache-to=type=gha,mode=max"
           else
-            docker buildx bake -f docker-bake.hcl ${BUILD_TARGET} --push
+            docker buildx bake -f docker-bake.hcl ${BUILD_TARGET} --push \
+              --set "*.cache-from=type=gha" \
+              --set "*.cache-to=type=gha,mode=max"
           fi
+
+          # Clean up after build
+          docker system prune -f
