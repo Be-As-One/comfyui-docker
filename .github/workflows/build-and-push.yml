@@ -1,0 +1,70 @@
+name: Build and Push Docker Images
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      build_target:
+        description: 'Build target'
+        required: false
+        default: 'default'
+        type: choice
+        options:
+          - default
+          - all
+          - cu124-py311
+          - cu124-py312
+          - cu128-py311
+          - cu128-py312
+
+env:
+  REGISTRY: docker.io
+  REGISTRY_USER: ${{ secrets.DOCKER_USERNAME || 'useless1234567' }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Determine build target
+        id: target
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            BUILD_TARGET="${{ github.event.inputs.build_target }}"
+          elif [[ "${{ github.ref_type }}" == "tag" ]]; then
+            BUILD_TARGET="all"
+          else
+            BUILD_TARGET="default"
+          fi
+          echo "BUILD_TARGET=${BUILD_TARGET}" >> $GITHUB_OUTPUT
+          echo "Building target: ${BUILD_TARGET}"
+
+      - name: Build and push Docker images
+        env:
+          BUILD_TARGET: ${{ steps.target.outputs.BUILD_TARGET }}
+        run: |
+          if [[ "${BUILD_TARGET}" == "default" ]]; then
+            docker buildx bake -f docker-bake.hcl --push
+          elif [[ "${BUILD_TARGET}" == "all" ]]; then
+            docker buildx bake -f docker-bake.hcl all --push
+          else
+            docker buildx bake -f docker-bake.hcl ${BUILD_TARGET} --push
+          fi
