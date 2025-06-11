@@ -161,23 +161,25 @@ jobs:
       - name: Send Feishu notification on success
         if: success()
         run: |
+          BUILD_TIME=$(date '+%Y-%m-%d %H:%M:%S UTC')
           curl -X POST "https://open.feishu.cn/open-apis/bot/v2/hook/63f35e91-c544-44f0-b10b-54d8af35d9e7" \
             -H "Content-Type: application/json" \
             -d '{
               "msg_type": "text",
               "content": {
-                "text": "🎉 ComfyUI Docker 构建成功！\n\n📦 构建目标: ${{ steps.target.outputs.BUILD_TARGET }}\n🏷️ 镜像标签: ${{ env.REGISTRY_USER }}/comfyui:${{ steps.target.outputs.BUILD_TARGET }}-v0.3.40-fastapi-v0.0.1\n🔗 仓库: ${{ github.repository }}\n📝 提交: ${{ github.sha }}\n👤 提交者: ${{ github.actor }}\n⏰ 构建时间: $(date)"
+                "text": "🎉 ComfyUI Docker 构建成功！\n\n📦 构建目标: ${{ steps.target.outputs.BUILD_TARGET }}\n🏷️ 镜像标签: ${{ env.REGISTRY_USER }}/comfyui:${{ steps.target.outputs.BUILD_TARGET }}-v0.3.40-fastapi-v0.0.1\n🔗 仓库: ${{ github.repository }}\n📝 提交: ${{ github.sha }}\n👤 提交者: ${{ github.actor }}\n⏰ 构建时间: '"${BUILD_TIME}"'"
               }
             }'
 
       - name: Send Feishu notification on failure
         if: failure()
         run: |
+          FAILURE_TIME=$(date '+%Y-%m-%d %H:%M:%S UTC')
           curl -X POST "https://open.feishu.cn/open-apis/bot/v2/hook/63f35e91-c544-44f0-b10b-54d8af35d9e7" \
             -H "Content-Type: application/json" \
             -d '{
               "msg_type": "text",
               "content": {
-                "text": "❌ ComfyUI Docker 构建失败！\n\n📦 构建目标: ${{ steps.target.outputs.BUILD_TARGET }}\n🔗 仓库: ${{ github.repository }}\n📝 提交: ${{ github.sha }}\n👤 提交者: ${{ github.actor }}\n⏰ 失败时间: $(date)\n🔍 查看详情: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                "text": "❌ ComfyUI Docker 构建失败！\n\n📦 构建目标: ${{ steps.target.outputs.BUILD_TARGET }}\n🔗 仓库: ${{ github.repository }}\n📝 提交: ${{ github.sha }}\n👤 提交者: ${{ github.actor }}\n⏰ 失败时间: '"${FAILURE_TIME}"'\n🔍 查看详情: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
               }
             }'
