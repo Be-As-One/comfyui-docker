@@ -70,7 +70,7 @@ jobs:
           elif [[ "${{ github.ref_type }}" == "tag" ]]; then
             BUILD_TARGET="all"
           else
-            BUILD_TARGET="default"
+            BUILD_TARGET="cu128-py312"
           fi
           echo "BUILD_TARGET=${BUILD_TARGET}" >> $GITHUB_OUTPUT
           echo "Building target: ${BUILD_TARGET}"
