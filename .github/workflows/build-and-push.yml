@@ -91,32 +91,6 @@ jobs:
             image=moby/buildkit:latest
             network=host
 
-      - name: Cache Docker layers
-        uses: actions/cache@v4
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-
-      - name: Cache pip packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('build/install_comfyui.sh') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
-      - name: Cache git repositories
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/git
-            /tmp/git-cache
-          key: ${{ runner.os }}-git-${{ hashFiles('build/install_comfyui.sh') }}
-          restore-keys: |
-            ${{ runner.os }}-git-
-
       - name: Check Docker credentials
         run: |
           echo "Checking Docker credentials..."
@@ -167,18 +141,18 @@ jobs:
           echo "Disk space before build:"
           df -h
 
-          # 组合多种缓存策略
-          CACHE_ARGS="--set *.cache-from=type=gha"
-          CACHE_ARGS="${CACHE_ARGS} --set *.cache-from=type=local,src=/tmp/.buildx-cache"
-          CACHE_ARGS="${CACHE_ARGS} --set *.cache-to=type=gha,mode=max"
-          CACHE_ARGS="${CACHE_ARGS} --set *.cache-to=type=local,dest=/tmp/.buildx-cache,mode=max"
-
           if [[ "${BUILD_TARGET}" == "default" ]]; then
-            docker buildx bake -f docker-bake.hcl --push ${CACHE_ARGS}
+            docker buildx bake -f docker-bake.hcl --push \
+              --set "*.cache-from=type=gha" \
+              --set "*.cache-to=type=gha,mode=max"
           elif [[ "${BUILD_TARGET}" == "all" ]]; then
-            docker buildx bake -f docker-bake.hcl all --push ${CACHE_ARGS}
+            docker buildx bake -f docker-bake.hcl all --push \
+              --set "*.cache-from=type=gha" \
+              --set "*.cache-to=type=gha,mode=max"
           else
-            docker buildx bake -f docker-bake.hcl ${BUILD_TARGET} --push ${CACHE_ARGS}
+            docker buildx bake -f docker-bake.hcl ${BUILD_TARGET} --push \
+              --set "*.cache-from=type=gha" \
+              --set "*.cache-to=type=gha,mode=max"
           fi
 
           # Clean up after build
