@@ -23,7 +23,7 @@ variable "BASE_IMAGE_VERSION" {
 }
 
 group "default" {
-    targets = ["cu128-py312"]
+    targets = ["cu128-py312","cu124-py312"]
 }
 
 group "all" {
