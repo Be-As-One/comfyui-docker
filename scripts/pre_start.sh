@@ -153,8 +153,8 @@ else
 fi
 
 # Start application manager
-cd /app-manager
-npm start > /workspace/logs/app-manager.log 2>&1 &
+# cd /app-manager
+# npm start > /workspace/logs/app-manager.log 2>&1 &
 
 # Start FastAPI service
 /start_fastapi.sh

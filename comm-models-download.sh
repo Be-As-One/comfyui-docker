@@ -3,13 +3,13 @@ huggingface-cli download ByteDance/Hyper-SD Hyper-SD15-8steps-lora.safetensors -
 
 huggingface-cli download comfyanonymous/ControlNet-v1-1_fp16_safetensors \
   control_v11p_sd15_openpose_fp16.safetensors \
-  --local-dir /workspace/ComfyUI/models/controlnets
+  --local-dir /workspace/ComfyUI/models/controlnet
 
 
 huggingface-cli download dputilov/exp \
   epicrealism_v10-inpainting.safetensors \
   --repo-type dataset \
-  --local-dir /workspace/ComfyUI/models/controlnets
+  --local-dir /workspace/ComfyUI/models/checkpoints
 
 
 huggingface-cli download Comfy-Org/stable-diffusion-v1-5-archive \
