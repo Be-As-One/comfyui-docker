@@ -10,6 +10,7 @@ ARG TORCH_VERSION
 ARG XFORMERS_VERSION
 ARG INDEX_URL
 ARG COMFYUI_COMMIT
+RUN mv ./requirements.txt ./ComfyUI/requirements.txt
 RUN /install_comfyui.sh
 
 # Install Application Manager
