@@ -12,9 +12,9 @@ source /workspace/ComfyUI/venv/bin/activate
 
 # Start FastAPI using nohup
 # nohup python main.py > /workspace/logs/fastapi.log 2>&1 &
-export LOG_FILE=/workspace/logs/fastapi.log && nohup python main.py >/dev/null 2>&1 &
+export LOG_FILE=/workspace/logs/fastapi-${RUNPOD_POD_ID}.log && nohup python main.py >/dev/null 2>&1 &
 
 echo "FastAPI started on port 8001"
-echo "FastAPI log file: /workspace/logs/fastapi.log"
+echo "FastAPI log file: /workspace/logs/fastapi-${RUNPOD_POD_ID}.log"
 
 deactivate
