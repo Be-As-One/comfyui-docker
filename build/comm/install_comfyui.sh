@@ -26,7 +26,7 @@ cd custom_nodes/ComfyUI-Manager
 pip3 install -r requirements.txt
 
 # Download additional custom nodes
-bash /build/comm/comm-models-download.sh
+bash /comm-models-download.sh
 
 
 
