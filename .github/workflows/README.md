@@ -19,7 +19,7 @@
 **构建目标:**
 - `default`: 构建默认目标 (cu128-py312)
 - `all`: 构建所有变体
-- 特定目标: cu124-py311, cu124-py312, cu128-py311, cu128-py312
+- 特定目标: cu124-py311-comm, cu124-py312-comm, cu128-py311-comm, cu128-py312-comm
 
 ## 设置要求
 
