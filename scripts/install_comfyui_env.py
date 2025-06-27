@@ -4,7 +4,7 @@ Environment-specific ComfyUI installer with integrated shared models management
 Usage: install_comfyui_env.py <environment> [skip_models|status]
 Examples: 
   install_comfyui_env.py comm
-  install_comfyui_env.py aua-sp skip_models
+  install_comfyui_env.py comm skip_models
   install_comfyui_env.py comm status
   
 Features:
@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 class ComfyUIEnvironmentInstaller:
     """Manages the installation of ComfyUI environments"""
     
-    VALID_ENVIRONMENTS = ['comm', 'aua-sp']
+    VALID_ENVIRONMENTS = ['comm']
     
     def __init__(self, environment: str, skip_models: bool = False):
         self.environment = environment
@@ -363,11 +363,11 @@ class ComfyUIEnvironmentInstaller:
 def main():
     """Main entry point"""
     if len(sys.argv) < 2:
-        logger.error("Environment name required (comm or aua-sp)")
+        logger.error("Environment name required (comm)")
         print(f"Usage: {sys.argv[0]} <environment> [skip_models|status]")
         print("Examples:")
         print(f"  {sys.argv[0]} comm")
-        print(f"  {sys.argv[0]} aua-sp skip_models")
+        print(f"  {sys.argv[0]} comm skip_models")
         print(f"  {sys.argv[0]} comm status")
         sys.exit(1)
         
