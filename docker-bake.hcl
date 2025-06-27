@@ -23,21 +23,43 @@ variable "BASE_IMAGE_VERSION" {
 }
 
 group "default" {
-    targets = ["cu128-py312","cu124-py312"]
+    targets = ["cu128-py312-comm","cu124-py312-comm"]
 }
 
 group "all" {
     targets = [
-        "cu124-py311",
-        "cu124-py312",
-        "cu128-py311",
-        "cu128-py312"
+        "cu124-py311-comm",
+        "cu124-py312-comm", 
+        "cu128-py311-comm",
+        "cu128-py312-comm",
+        "cu124-py311-aua-sp",
+        "cu124-py312-aua-sp",
+        "cu128-py311-aua-sp", 
+        "cu128-py312-aua-sp"
     ]
 }
 
-target "cu124-py311" {
+group "comm" {
+    targets = [
+        "cu124-py311-comm",
+        "cu124-py312-comm",
+        "cu128-py311-comm", 
+        "cu128-py312-comm"
+    ]
+}
+
+group "aua-sp" {
+    targets = [
+        "cu124-py311-aua-sp",
+        "cu124-py312-aua-sp",
+        "cu128-py311-aua-sp",
+        "cu128-py312-aua-sp"
+    ]
+}
+
+target "cu124-py311-comm" {
     dockerfile = "Dockerfile"
-    tags = ["${REGISTRY}/${REGISTRY_USER}/${APP}:cu124-py311-${RELEASE}"]
+    tags = ["${REGISTRY}/${REGISTRY_USER}/${APP}:cu124-py311-comm-${RELEASE}"]
     args = {
         RELEASE                    = "${RELEASE}"
         BASE_IMAGE                 = "${BASE_IMAGE_REPOSITORY}:${BASE_IMAGE_VERSION}-python3.11-cuda12.4.1-torch2.6.0"
@@ -47,13 +69,31 @@ target "cu124-py311" {
         COMFYUI_COMMIT             = "${RELEASE}"
         APP_MANAGER_VERSION        = "1.2.2"
         CIVITAI_DOWNLOADER_VERSION = "2.1.0"
+        WORKFLOW                   = "comm"
     }
     platforms = ["linux/amd64"]
 }
 
-target "cu124-py312" {
+target "cu124-py311-aua-sp" {
     dockerfile = "Dockerfile"
-    tags = ["${REGISTRY}/${REGISTRY_USER}/${APP}:cu124-py312-${RELEASE}"]
+    tags = ["${REGISTRY}/${REGISTRY_USER}/${APP}:cu124-py311-aua-sp-${RELEASE}"]
+    args = {
+        RELEASE                    = "${RELEASE}"
+        BASE_IMAGE                 = "${BASE_IMAGE_REPOSITORY}:${BASE_IMAGE_VERSION}-python3.11-cuda12.4.1-torch2.6.0"
+        INDEX_URL                  = "https://download.pytorch.org/whl/cu124"
+        TORCH_VERSION              = "2.6.0+cu124"
+        XFORMERS_VERSION           = "0.0.29.post3"
+        COMFYUI_COMMIT             = "${RELEASE}"
+        APP_MANAGER_VERSION        = "1.2.2"
+        CIVITAI_DOWNLOADER_VERSION = "2.1.0"
+        WORKFLOW                   = "aua-sp"
+    }
+    platforms = ["linux/amd64"]
+}
+
+target "cu124-py312-comm" {
+    dockerfile = "Dockerfile"
+    tags = ["${REGISTRY}/${REGISTRY_USER}/${APP}:cu124-py312-comm-${RELEASE}"]
     args = {
         RELEASE                    = "${RELEASE}"
         BASE_IMAGE                 = "${BASE_IMAGE_REPOSITORY}:${BASE_IMAGE_VERSION}-python3.12-cuda12.4.1-torch2.6.0"
@@ -63,13 +103,31 @@ target "cu124-py312" {
         COMFYUI_COMMIT             = "${RELEASE}"
         APP_MANAGER_VERSION        = "1.2.2"
         CIVITAI_DOWNLOADER_VERSION = "2.1.0"
+        WORKFLOW                   = "comm"
     }
     platforms = ["linux/amd64"]
 }
 
-target "cu128-py311" {
+target "cu124-py312-aua-sp" {
     dockerfile = "Dockerfile"
-    tags = ["${REGISTRY}/${REGISTRY_USER}/${APP}:cu128-py311-${RELEASE}"]
+    tags = ["${REGISTRY}/${REGISTRY_USER}/${APP}:cu124-py312-aua-sp-${RELEASE}"]
+    args = {
+        RELEASE                    = "${RELEASE}"
+        BASE_IMAGE                 = "${BASE_IMAGE_REPOSITORY}:${BASE_IMAGE_VERSION}-python3.12-cuda12.4.1-torch2.6.0"
+        INDEX_URL                  = "https://download.pytorch.org/whl/cu124"
+        TORCH_VERSION              = "2.6.0+cu124"
+        XFORMERS_VERSION           = "0.0.29.post3"
+        COMFYUI_COMMIT             = "${RELEASE}"
+        APP_MANAGER_VERSION        = "1.2.2"
+        CIVITAI_DOWNLOADER_VERSION = "2.1.0"
+        WORKFLOW                   = "aua-sp"
+    }
+    platforms = ["linux/amd64"]
+}
+
+target "cu128-py311-comm" {
+    dockerfile = "Dockerfile"
+    tags = ["${REGISTRY}/${REGISTRY_USER}/${APP}:cu128-py311-comm-${RELEASE}"]
     args = {
         RELEASE                    = "${RELEASE}"
         BASE_IMAGE                 = "${BASE_IMAGE_REPOSITORY}:${BASE_IMAGE_VERSION}-python3.11-cuda12.8.1-torch2.7.0"
@@ -79,13 +137,31 @@ target "cu128-py311" {
         COMFYUI_COMMIT             = "${RELEASE}"
         APP_MANAGER_VERSION        = "1.2.2"
         CIVITAI_DOWNLOADER_VERSION = "2.1.0"
+        WORKFLOW                   = "comm"
     }
     platforms = ["linux/amd64"]
 }
 
-target "cu128-py312" {
+target "cu128-py311-aua-sp" {
     dockerfile = "Dockerfile"
-    tags = ["${REGISTRY}/${REGISTRY_USER}/${APP}:cu128-py312-${RELEASE}"]
+    tags = ["${REGISTRY}/${REGISTRY_USER}/${APP}:cu128-py311-aua-sp-${RELEASE}"]
+    args = {
+        RELEASE                    = "${RELEASE}"
+        BASE_IMAGE                 = "${BASE_IMAGE_REPOSITORY}:${BASE_IMAGE_VERSION}-python3.11-cuda12.8.1-torch2.7.0"
+        INDEX_URL                  = "https://download.pytorch.org/whl/cu128"
+        TORCH_VERSION              = "2.7.0+cu128"
+        XFORMERS_VERSION           = "0.0.30"
+        COMFYUI_COMMIT             = "${RELEASE}"
+        APP_MANAGER_VERSION        = "1.2.2"
+        CIVITAI_DOWNLOADER_VERSION = "2.1.0"
+        WORKFLOW                   = "aua-sp"
+    }
+    platforms = ["linux/amd64"]
+}
+
+target "cu128-py312-comm" {
+    dockerfile = "Dockerfile"
+    tags = ["${REGISTRY}/${REGISTRY_USER}/${APP}:cu128-py312-comm-${RELEASE}"]
     args = {
         RELEASE                    = "${RELEASE}"
         BASE_IMAGE                 = "${BASE_IMAGE_REPOSITORY}:${BASE_IMAGE_VERSION}-python3.12-cuda12.8.1-torch2.7.0"
@@ -95,6 +171,24 @@ target "cu128-py312" {
         COMFYUI_COMMIT             = "${RELEASE}"
         APP_MANAGER_VERSION        = "1.2.2"
         CIVITAI_DOWNLOADER_VERSION = "2.1.0"
+        WORKFLOW                   = "comm"
+    }
+    platforms = ["linux/amd64"]
+}
+
+target "cu128-py312-aua-sp" {
+    dockerfile = "Dockerfile"
+    tags = ["${REGISTRY}/${REGISTRY_USER}/${APP}:cu128-py312-aua-sp-${RELEASE}"]
+    args = {
+        RELEASE                    = "${RELEASE}"
+        BASE_IMAGE                 = "${BASE_IMAGE_REPOSITORY}:${BASE_IMAGE_VERSION}-python3.12-cuda12.8.1-torch2.7.0"
+        INDEX_URL                  = "https://download.pytorch.org/whl/cu128"
+        TORCH_VERSION              = "2.7.0+cu128"
+        XFORMERS_VERSION           = "0.0.30"
+        COMFYUI_COMMIT             = "${RELEASE}"
+        APP_MANAGER_VERSION        = "1.2.2"
+        CIVITAI_DOWNLOADER_VERSION = "2.1.0"
+        WORKFLOW                   = "aua-sp"
     }
     platforms = ["linux/amd64"]
 }

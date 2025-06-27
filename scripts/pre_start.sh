@@ -129,10 +129,6 @@ sync_apps() {
     fi
 }
 
-fix_venvs() {
-    echo "VENV: Fixing venv..."
-    /fix_venv.sh /ComfyUI/venv /workspace/ComfyUI/venv
-}
 
 if [ "$(printf '%s\n' "$EXISTING_VERSION" "$TEMPLATE_VERSION" | sort -V | head -n 1)" = "$EXISTING_VERSION" ]; then
     if [ "$EXISTING_VERSION" != "$TEMPLATE_VERSION" ]; then
@@ -141,7 +137,6 @@ if [ "$(printf '%s\n' "$EXISTING_VERSION" "$TEMPLATE_VERSION" | sort -V | head -
         rm -rf /workspace/ComfyUI/venv
 
         sync_apps
-        fix_venvs
 
         # Create logs directory
         mkdir -p /workspace/logs
@@ -159,21 +154,17 @@ fi
 # Start FastAPI service
 /start_fastapi.sh
 
-if [[ ${DISABLE_AUTOLAUNCH} ]]
+# ComfyUI auto-launch enabled by default to provide fallback FastAPI service
+DISABLE_AUTOLAUNCH=${DISABLE_AUTOLAUNCH:-false}
+
+if [[ ${DISABLE_AUTOLAUNCH} == "true" ]]
 then
-    echo "Auto launching is disabled so the applications will not be started automatically"
-    echo "You can launch them manually using the launcher scripts:"
-    echo ""
-    echo "   /start_comfyui.sh"
+    echo "ComfyUI auto-launch is disabled (default behavior)"
+    echo "ComfyUI instances can be started via external API calls or manually using:"
+    echo "   /start_comfyui.sh <instance_id>"
 else
-    ARGS=()
-
-    if [[ ${EXTRA_ARGS} ]];
-    then
-          ARGS=("${ARGS[@]}" ${EXTRA_ARGS})
-    fi
-
-    /start_comfyui.sh "${ARGS[@]}"
+    echo "Starting ComfyUI automatically..."
+    /start_comfyui.sh 0
 fi
 
 echo "Pre-start initialization completed"

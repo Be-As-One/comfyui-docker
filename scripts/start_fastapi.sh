@@ -1,20 +1,8 @@
 #!/usr/bin/env bash
-
 export PYTHONUNBUFFERED=1
-echo "Starting FastAPI service..."
-
-# Ensure logs directory exists
-mkdir -p /workspace/logs
-
-# Navigate to FastAPI directory and activate venv
 cd /workspace/ComfyUI/comfyui-fastapi
 source /workspace/ComfyUI/venv/bin/activate
-
-# Start FastAPI using nohup
-# nohup python main.py > /workspace/logs/fastapi.log 2>&1 &
-export LOG_FILE=/workspace/logs/fastapi-${RUNPOD_POD_ID}.log && nohup python main.py >/dev/null 2>&1 &
-
-echo "FastAPI started on port 8001"
-echo "FastAPI log file: /workspace/logs/fastapi-${RUNPOD_POD_ID}.log"
-
+echo "FASTAPI: Starting FastAPI"
+python main.py > /workspace/logs/fastapi.log 2>&1 &
+echo "FASTAPI: FastAPI Started"
 deactivate

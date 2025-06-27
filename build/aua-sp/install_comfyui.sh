@@ -65,7 +65,7 @@ pip3 install -r requirements.txt
 
 # Install ComfyUI-FastAPI
 cd /ComfyUI
-git clone https://github.com/hzeyuan/comfyui-fastapi.git 
+git clone https://github.com/Be-As-One/comfyui-fastapi.git 
 cd /ComfyUI/comfyui-fastapi
 pip3 install -r requirements.txt
 
