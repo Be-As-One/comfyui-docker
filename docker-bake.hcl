@@ -23,31 +23,31 @@ variable "BASE_IMAGE_VERSION" {
 }
 
 group "default" {
-    targets = ["cu128-py312-comm","cu124-py312-comm"]
+    targets = ["cu128-py312","cu124-py312"]
 }
 
 group "all" {
     targets = [
-        "cu124-py311-comm",
-        "cu124-py312-comm", 
-        "cu128-py311-comm",
-        "cu128-py312-comm"
+        "cu124-py311",
+        "cu124-py312", 
+        "cu128-py311",
+        "cu128-py312"
     ]
 }
 
 group "comm" {
     targets = [
-        "cu124-py311-comm",
-        "cu124-py312-comm",
-        "cu128-py311-comm", 
-        "cu128-py312-comm"
+        "cu124-py311",
+        "cu124-py312",
+        "cu128-py311", 
+        "cu128-py312"
     ]
 }
 
 
-target "cu124-py311-comm" {
+target "cu124-py311" {
     dockerfile = "Dockerfile"
-    tags = ["${REGISTRY}/${REGISTRY_USER}/${APP}:cu124-py311-comm-${RELEASE}"]
+    tags = ["${REGISTRY}/${REGISTRY_USER}/${APP}:cu124-py311-${RELEASE}"]
     args = {
         RELEASE                    = "${RELEASE}"
         BASE_IMAGE                 = "${BASE_IMAGE_REPOSITORY}:${BASE_IMAGE_VERSION}-python3.11-cuda12.4.1-torch2.6.0"
@@ -63,9 +63,9 @@ target "cu124-py311-comm" {
 }
 
 
-target "cu124-py312-comm" {
+target "cu124-py312" {
     dockerfile = "Dockerfile"
-    tags = ["${REGISTRY}/${REGISTRY_USER}/${APP}:cu124-py312-comm-${RELEASE}"]
+    tags = ["${REGISTRY}/${REGISTRY_USER}/${APP}:cu124-py312-${RELEASE}"]
     args = {
         RELEASE                    = "${RELEASE}"
         BASE_IMAGE                 = "${BASE_IMAGE_REPOSITORY}:${BASE_IMAGE_VERSION}-python3.12-cuda12.4.1-torch2.6.0"
@@ -81,9 +81,9 @@ target "cu124-py312-comm" {
 }
 
 
-target "cu128-py311-comm" {
+target "cu128-py311" {
     dockerfile = "Dockerfile"
-    tags = ["${REGISTRY}/${REGISTRY_USER}/${APP}:cu128-py311-comm-${RELEASE}"]
+    tags = ["${REGISTRY}/${REGISTRY_USER}/${APP}:cu128-py311-${RELEASE}"]
     args = {
         RELEASE                    = "${RELEASE}"
         BASE_IMAGE                 = "${BASE_IMAGE_REPOSITORY}:${BASE_IMAGE_VERSION}-python3.11-cuda12.8.1-torch2.7.0"
@@ -99,9 +99,9 @@ target "cu128-py311-comm" {
 }
 
 
-target "cu128-py312-comm" {
+target "cu128-py312" {
     dockerfile = "Dockerfile"
-    tags = ["${REGISTRY}/${REGISTRY_USER}/${APP}:cu128-py312-comm-${RELEASE}"]
+    tags = ["${REGISTRY}/${REGISTRY_USER}/${APP}:cu128-py312-${RELEASE}"]
     args = {
         RELEASE                    = "${RELEASE}"
         BASE_IMAGE                 = "${BASE_IMAGE_REPOSITORY}:${BASE_IMAGE_VERSION}-python3.12-cuda12.8.1-torch2.7.0"
