@@ -8,6 +8,8 @@ ENV WORKFLOW=${WORKFLOW}
 # Copy the build scripts for the specific workflow
 WORKDIR /
 COPY --chmod=755 build/${WORKFLOW}/* ./
+# Copy all build scripts to /build/ directory for runtime use
+COPY --chmod=755 build/ /build/
 
 # Install ComfyUI
 ARG TORCH_VERSION
@@ -22,8 +24,8 @@ RUN /install_comfyui.sh
 ARG CIVITAI_DOWNLOADER_VERSION
 RUN /install_civitai_model_downloader.sh
 
-# Cleanup installation scripts
-RUN rm -f /install_*.sh
+# Cleanup installation scripts from root directory only (keep them in /build/)
+RUN rm -f /install_*.sh /comm-models-download.sh /install_civitai_model_downloader.sh /requirements.txt
 
 # Remove existing SSH host keys
 RUN rm -f /etc/ssh/ssh_host_*
