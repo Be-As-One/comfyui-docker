@@ -132,14 +132,19 @@ sync_apps() {
 
 if [ "$(printf '%s\n' "$EXISTING_VERSION" "$TEMPLATE_VERSION" | sort -V | head -n 1)" = "$EXISTING_VERSION" ]; then
     if [ "$EXISTING_VERSION" != "$TEMPLATE_VERSION" ]; then
-        # 强制删除现有的 venv 以确保完全重新同步
-        echo "SYNC: Removing existing venv to ensure clean sync..."
-        rm -rf /workspace/ComfyUI/venv
+        # Only proceed with sync if DISABLE_SYNC is not set
+        if [ -z "${DISABLE_SYNC}" ]; then
+            # 强制删除现有的 venv 以确保完全重新同步
+            echo "SYNC: Removing existing venv to ensure clean sync..."
+            rm -rf /workspace/ComfyUI/venv
 
-        sync_apps
+            sync_apps
 
-        # Create logs directory
-        mkdir -p /workspace/logs
+            # Create logs directory
+            mkdir -p /workspace/logs
+        else
+            echo "SYNC: Sync disabled by DISABLE_SYNC environment variable"
+        fi
     else
         echo "SYNC: Existing version is the same as the template version, no syncing required."
     fi

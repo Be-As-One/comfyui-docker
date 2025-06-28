@@ -85,8 +85,12 @@ class ComfyUIEnvironmentInstaller:
         with open(install_script, 'r') as f:
             content = f.read()
             
-        # Replace /ComfyUI with environment-specific path
-        content = content.replace('/ComfyUI', str(self.env_dir))
+        # Replace /ComfyUI with environment-specific path (but not in Git URLs)
+        import re
+        # Replace /ComfyUI at the end of commands (target paths) but not in URLs
+        content = re.sub(r'(/ComfyUI)(?=\s|$)', str(self.env_dir), content)
+        # Also handle specific git clone pattern to avoid replacing URLs
+        content = re.sub(r'(git clone .+?\.git)\s+/workspace/ComfyUI-\w+', r'\1 ' + str(self.env_dir), content)
         
         with open(install_script, 'w') as f:
             f.write(content)
