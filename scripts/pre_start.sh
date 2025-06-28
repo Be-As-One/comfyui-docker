@@ -62,13 +62,14 @@ sync_directory() {
         # 计算源目录总大小（用于进度条显示）
         local total_size=$(du -sb "${src_dir}" | cut -f1)
 
-        # 构建 tar 命令（排除临时文件和日志）
+        # 构建 tar 命令（排除临时文件、日志和venv）
         local tar_cmd="tar --create \
             --file=- \
             --directory="${src_dir}" \
             --exclude='*.pyc' \
             --exclude='__pycache__' \
             --exclude='*.log' \
+            --exclude='venv' \
             --blocking-factor=64 \
             --record-size=64K \
             --sparse \
@@ -94,11 +95,13 @@ sync_directory() {
         echo "SYNC: Using rsync for sync (skip existing files)"
         rsync -rlptDu \
             --ignore-existing \
+            --exclude='venv' \
             "${src_dir}/" "${dst_dir}/"
     else
         echo "SYNC: Unknown filesystem type (${workspace_fs}) for /workspace, defaulting to rsync (skip existing files)"
         rsync -rlptDu \
             --ignore-existing \
+            --exclude='venv' \
             "${src_dir}/" "${dst_dir}/"
     fi
 }
@@ -118,6 +121,21 @@ sync_apps() {
         sync_directory "/${APP}" "/workspace/${APP}-${COMFYUI_ENVIRONMENT}"
         save_template_json
         echo "${VENV_PATH}" > "/workspace/${APP}-${COMFYUI_ENVIRONMENT}/venv_path"
+        
+        # Create venv in workspace if it doesn't exist
+        WORKSPACE_VENV_PATH="/workspace/${APP}-${COMFYUI_ENVIRONMENT}/venv"
+        if [ ! -d "${WORKSPACE_VENV_PATH}" ]; then
+            echo "SYNC: Creating Python virtual environment in workspace..."
+            cd "/workspace/${APP}-${COMFYUI_ENVIRONMENT}"
+            
+            # Copy venv from container
+            echo "SYNC: Copying venv from container..."
+            cp -r "/${APP}/venv" "${WORKSPACE_VENV_PATH}"
+            
+            echo "SYNC: Virtual environment created successfully"
+        else
+            echo "SYNC: Virtual environment already exists in workspace"
+        fi
 
         # End the timer and calculate the duration
         end_time=$(date +%s)
