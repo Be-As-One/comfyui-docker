@@ -118,7 +118,7 @@ sync_apps() {
         echo "SYNC: Sync 1 of 1"
         # Get the current environment (defaults to comm)
         COMFYUI_ENVIRONMENT=${COMFYUI_ENVIRONMENT:-"comm"}
-        sync_directory "/${APP}" "/workspace/${APP}-${COMFYUI_ENVIRONMENT}"
+        sync_directory "/${APP}" "/workspace/${APP}-${COMFYUI_ENVIRONMENT}" true
         save_template_json
         echo "${VENV_PATH}" > "/workspace/${APP}-${COMFYUI_ENVIRONMENT}/venv_path"
         
