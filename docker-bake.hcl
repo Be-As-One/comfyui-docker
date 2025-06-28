@@ -11,7 +11,7 @@ variable "APP" {
 }
 
 variable "RELEASE" {
-    default = "v0.3.40-fastapi-v0.0.5"
+    default = "v0.3.40-fastapi-v0.0.6"
 }
 
 variable "BASE_IMAGE_REPOSITORY" {
