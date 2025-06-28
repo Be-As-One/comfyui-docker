@@ -198,7 +198,3 @@ fi
 
 echo "Pre-start initialization completed"
 
-# Keep container running
-while true; do
-    sleep 3600  # Sleep for 1 hour, then repeat
-done
