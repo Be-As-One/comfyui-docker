@@ -118,7 +118,9 @@ sync_apps() {
         echo "SYNC: Sync 1 of 1"
         # Get the current environment (defaults to comm)
         COMFYUI_ENVIRONMENT=${COMFYUI_ENVIRONMENT:-"comm"}
-        sync_directory "/${APP}" "/workspace/${APP}-${COMFYUI_ENVIRONMENT}" true
+        # Use compression if enabled (default: true for better performance)
+        USE_COMPRESSION=${USE_COMPRESSION:-true}
+        sync_directory "/${APP}" "/workspace/${APP}-${COMFYUI_ENVIRONMENT}" "${USE_COMPRESSION}"
         save_template_json
         echo "${VENV_PATH}" > "/workspace/${APP}-${COMFYUI_ENVIRONMENT}/venv_path"
         
@@ -182,7 +184,7 @@ fi
 /start_fastapi.sh
 
 # ComfyUI auto-launch enabled by default to provide fallback FastAPI service
-DISABLE_AUTOLAUNCH=${DISABLE_AUTOLAUNCH:-false}
+DISABLE_AUTOLAUNCH=${DISABLE_AUTOLAUNCH:-true}
 
 if [[ ${DISABLE_AUTOLAUNCH} == "true" ]]
 then
@@ -195,3 +197,8 @@ else
 fi
 
 echo "Pre-start initialization completed"
+
+# Keep container running
+while true; do
+    sleep 3600  # Sleep for 1 hour, then repeat
+done
