@@ -112,9 +112,11 @@ sync_apps() {
         start_time=$(date +%s)
 
         echo "SYNC: Sync 1 of 1"
-        sync_directory "/${APP}" "/workspace/${APP}"
+        # Get the current environment (defaults to comm)
+        COMFYUI_ENVIRONMENT=${COMFYUI_ENVIRONMENT:-"comm"}
+        sync_directory "/${APP}" "/workspace/${APP}-${COMFYUI_ENVIRONMENT}"
         save_template_json
-        echo "${VENV_PATH}" > "/workspace/${APP}/venv_path"
+        echo "${VENV_PATH}" > "/workspace/${APP}-${COMFYUI_ENVIRONMENT}/venv_path"
 
         # End the timer and calculate the duration
         end_time=$(date +%s)
@@ -136,7 +138,8 @@ if [ "$(printf '%s\n' "$EXISTING_VERSION" "$TEMPLATE_VERSION" | sort -V | head -
         if [ -z "${DISABLE_SYNC}" ]; then
             # 强制删除现有的 venv 以确保完全重新同步
             echo "SYNC: Removing existing venv to ensure clean sync..."
-            rm -rf /workspace/ComfyUI/venv
+            COMFYUI_ENVIRONMENT=${COMFYUI_ENVIRONMENT:-"comm"}
+            rm -rf /workspace/ComfyUI-${COMFYUI_ENVIRONMENT}/venv
 
             sync_apps
 
