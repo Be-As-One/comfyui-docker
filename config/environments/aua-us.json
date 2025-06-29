@@ -1,0 +1,33 @@
+{
+    "name": "aua-us",
+    "description": "AUA US environment with controlnet and pose estimation",
+    "nodes": [
+        "ltdrdata/ComfyUI-Manager",
+        "Kosinkadink/ComfyUI-Advanced-ControlNet",
+        "Fannovel16/comfyui_controlnet_aux",
+        "Acly/comfyui-inpaint-nodes",
+        "BadCafeCode/masquerade-nodes-comfyui",
+        "kijai/ComfyUI-Florence2",
+        "kijai/ComfyUI-segment-anything-2",
+        "cubiq/ComfyUI_essentials",
+        "pythongosssss/ComfyUI-Custom-Scripts",
+        "Suzie1/ComfyUI_Comfyroll_CustomNodes",
+        "ShmuelRonen/ComfyUI-Gemini_Flash_2.0_Exp",
+        "kijai/ComfyUI-KJNodes",
+        "WaddingtonHoldings/ComfyUI-InstaSD"
+    ],
+    "models": [
+        {
+            "url": "https://huggingface.co/comfyanonymous/ControlNet-v1-1_fp16_safetensors/resolve/main/control_v11p_sd15_openpose_fp16.safetensors",
+            "type": "controlnet"
+        },
+        {
+            "url": "https://huggingface.co/dputilov/exp/resolve/main/epicrealism_v10-inpainting.safetensors",
+            "type": "checkpoints"
+        },
+        {
+            "url": "https://huggingface.co/ByteDance/Hyper-SD/resolve/main/Hyper-SD15-8steps-lora.safetensors",
+            "type": "loras"
+        }
+    ]
+}

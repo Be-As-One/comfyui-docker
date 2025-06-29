@@ -1,0 +1,121 @@
+{
+    "name": "aua-sp",
+    "description": "AUA SP environment with extensive models and nodes",
+    "nodes": [
+        "ltdrdata/ComfyUI-Manager",
+        "cubiq/ComfyUI_InstantID",
+        "kijai/ComfyUI-KJNodes",
+        "nullquant/ComfyUI-BrushNet",
+        "cubiq/ComfyUI_FaceAnalysis",
+        "vuongminh1907/ComfyUI_ZenID",
+        "WaddingtonHoldings/ComfyUI-InstaSD",
+        "tsogzark/ComfyUI-load-image-from-url",
+        "papcorns/ComfyUI-Papcorns-Node-LoadImageFromUrl",
+        "jqy-yo/Comfyui-BBoxLowerMask2",
+        "yolain/ComfyUI-Easy-Use",
+        "cubiq/ComfyUI_IPAdapter_plus",
+        "Suzie1/ComfyUI_Comfyroll_CustomNodes"
+    ],
+    "models": [
+        {
+            "url": "https://storage.googleapis.com/model-file/comfy/lustifySDXLNSFW_oltFIXEDTEXTURES.safetensors",
+            "type": "checkpoints"
+        },
+        {
+            "url": "https://storage.googleapis.com/model-file/lora/1.5/Hyper-SDXL-8steps-lora.safetensors",
+            "type": "loras"
+        },
+        {
+            "url": "https://storage.googleapis.com/model-file/lora/1.5/female orgasm-SDXL-V1.safetensors",
+            "type": "loras"
+        },
+        {
+            "url": "https://storage.googleapis.com/model-file/comfy-diylab/models/instantid/ip-adapter-instantid.bin",
+            "type": "instantid"
+        },
+        {
+            "url": "https://storage.googleapis.com/model-file/comfy-diylab/models/insightface/inswapper_128.onnx",
+            "type": "insightface"
+        },
+        {
+            "url": "https://storage.googleapis.com/model-file/comfy-diylab/models/controlnet/diffusion_pytorch_model.safetensors",
+            "type": "controlnet"
+        },
+        {
+            "url": "https://huggingface.co/moiu2998/mymo/resolve/3c3093fa083909be34a10714c93874ce5c9dabc4/realisticVisionV60B1_v51VAE.safetensors",
+            "type": "checkpoints"
+        },
+        {
+            "url": "https://storage.googleapis.com/model-file/lora/1.5/cumfacial55_v2.safetensors",
+            "type": "loras"
+        },
+        {
+            "url": "https://storage.googleapis.com/model-file/lora/1.5/cum_b1.safetensors",
+            "type": "loras"
+        },
+        {
+            "url": "https://huggingface.co/liamhvn/epiCPhotoGasm-ultimate-fidelity/resolve/main/epicphotogasm_ultimateFidelity.safetensors",
+            "type": "checkpoints"
+        },
+        {
+            "url": "https://storage.googleapis.com/model-file/lora/1.5/cuminmouth.safetensors",
+            "type": "loras"
+        },
+        {
+            "url": "https://huggingface.co/comfyanonymous/ControlNet-v1-1_fp16_safetensors/resolve/main/control_v11p_sd15_openpose_fp16.safetensors",
+            "type": "controlnet"
+        },
+        {
+            "url": "https://storage.googleapis.com/model-file/comfy-diylab/models/insightface.zip",
+            "type": "insightface"
+        },
+        {
+            "url": "https://storage.googleapis.com/model-file/comfy/pornmaster_proSDXLV4VAE-nsfw.safetensors",
+            "type": "checkpoints"
+        },
+        {
+            "url": "https://storage.googleapis.com/model-file/comfy-lite/clip_vision/CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors",
+            "type": "clip_vision"
+        },
+        {
+            "url": "https://huggingface.co/h94/IP-Adapter-FaceID/resolve/main/ip-adapter-faceid-plusv2_sdxl.bin",
+            "type": "ipadapter"
+        },
+        {
+            "url": "https://huggingface.co/h94/IP-Adapter-FaceID/resolve/main/ip-adapter-faceid-plusv2_sdxl_lora.safetensors",
+            "type": "loras"
+        },
+        {
+            "url": "https://storage.googleapis.com/model-file/lora/1.5/gagged-4e.safetensors",
+            "type": "loras"
+        },
+        {
+            "url": "https://storage.googleapis.com/model-file/lora/1.5/shibari_v20.safetensors",
+            "type": "loras"
+        },
+        {
+            "url": "https://huggingface.co/ByteDance/Hyper-SD/resolve/main/Hyper-SD15-8steps-lora.safetensors",
+            "type": "loras"
+        },
+        {
+            "url": "https://storage.googleapis.com/model-file/comfy/cyberrealistic_v80Inpainting.safetensors",
+            "type": "checkpoints"
+        },
+        {
+            "url": "https://storage.googleapis.com/model-file/lora/1.5/betterleashes-000012.safetensors",
+            "type": "loras"
+        },
+        {
+            "url": "https://storage.googleapis.com/model-file/lora/1.5/Wetshirt.safetensors",
+            "type": "loras"
+        },
+        {
+            "url": "https://storage.googleapis.com/model-file/lora/1.5/CrotchlessPantsV1A10.safetensors",
+            "type": "loras"
+        },
+        {
+            "url": "https://storage.googleapis.com/model-file/lora/1.5/2FingersSDXL_v03.safetensors",
+            "type": "loras"
+        }
+    ]
+}

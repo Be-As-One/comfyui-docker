@@ -25,8 +25,8 @@ git clone https://github.com/ltdrdata/ComfyUI-Manager.git custom_nodes/ComfyUI-M
 cd custom_nodes/ComfyUI-Manager
 pip3 install -r requirements.txt
 
-# Download additional custom nodes
-bash $(dirname $0)/comm-models-download.sh
+# Download additional custom nodes using universal downloader
+python3 /universal_downloader.py comm
 
 
 

@@ -25,43 +25,8 @@ git clone https://github.com/ltdrdata/ComfyUI-Manager.git custom_nodes/ComfyUI-M
 cd custom_nodes/ComfyUI-Manager
 pip3 install -r requirements.txt
 
-# ComfyUI-Advanced-ControlNet
-git clone https://github.com/Kosinkadink/ComfyUI-Advanced-ControlNet.git \
-  /ComfyUI/custom_nodes/ComfyUI-Advanced-ControlNet
-
-
-# comfyui_controlnet_aux
-git clone https://github.com/Fannovel16/comfyui_controlnet_aux.git \
-  /ComfyUI/custom_nodes/comfyui_controlnet_aux
-
-cd /ComfyUI/custom_nodes/comfyui_controlnet_aux
-pip3 install -r requirements.txt
-
- # comfyui-inpaint-nodes
-git clone https://github.com/Acly/comfyui-inpaint-nodes.git \
-  /ComfyUI/custom_nodes/comfyui-inpaint-nodes
-
-# masquerade-nodes-comfyui
-git clone https://github.com/BadCafeCode/masquerade-nodes-comfyui.git \
-  /ComfyUI/custom_nodes/masquerade-nodes-comfyui
-
-# ComfyUI-Florence2
-git clone https://github.com/kijai/ComfyUI-Florence2.git \
-  /ComfyUI/custom_nodes/ComfyUI-Florence2
-
-cd /ComfyUI/custom_nodes/ComfyUI-Florence2
-pip3 install -r requirements.txt
-
-# ComfyUI-segment-anything-2
-git clone https://github.com/kijai/ComfyUI-segment-anything-2.git \
-  /ComfyUI/custom_nodes/ComfyUI-segment-anything-2
-
-# ComfyUI_essentials
-git clone https://github.com/cubiq/ComfyUI_essentials.git \
-  /ComfyUI/custom_nodes/ComfyUI_essentials
-
-cd /ComfyUI/custom_nodes/ComfyUI_essentials
-pip3 install -r requirements.txt
+# Download additional custom nodes and models using universal downloader
+python3 /universal_downloader.py aua-sp
 
 # Install ComfyUI-FastAPI
 cd /ComfyUI

@@ -1,0 +1,8 @@
+{
+    "name": "comm",
+    "description": "Basic ComfyUI environment with minimal dependencies",
+    "nodes": [
+        "ltdrdata/ComfyUI-Manager"
+    ],
+    "models": []
+}

@@ -45,6 +45,9 @@ ENV VENV_PATH=${VENV_PATH}
 WORKDIR /
 COPY --chmod=755 scripts/* ./
 
+# Copy configuration files
+COPY config/ /config/
+
 # Start the container
 SHELL ["/bin/bash", "--login", "-c"]
 CMD [ "/start.sh" ]
