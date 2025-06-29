@@ -43,13 +43,17 @@ sync_directory() {
 
     echo "SYNC: Syncing from ${src_dir} to ${dst_dir}, please wait (this can take a few minutes)..."
     echo "SYNC: Note - existing files will NOT be overwritten"
+    echo "SYNC: Source directory size: $(du -sh ${src_dir} | cut -f1)"
+    echo "SYNC: Compression enabled: ${use_compression}"
 
     # 确保目标目录存在
     mkdir -p "${dst_dir}"
+    echo "SYNC: Target directory created: ${dst_dir}"
 
     # 检查 /workspace 所在的文件系统类型
     local workspace_fs=$(df -T /workspace | awk 'NR==2 {print $2}')
     echo "SYNC: File system type: ${workspace_fs}"
+    echo "SYNC: Available space on target: $(df -h /workspace | awk 'NR==2 {print $4}')"
 
     # 使用 tar 进行同步（主要用于 fuse 文件系统，例如 RunPod 上挂载的网络卷）
     if [ "${workspace_fs}" = "fuse" ]; then
@@ -128,15 +132,21 @@ sync_apps() {
         WORKSPACE_VENV_PATH="/workspace/${APP}-${DEFAULT_ENV}/venv"
         if [ ! -d "${WORKSPACE_VENV_PATH}" ]; then
             echo "SYNC: Creating Python virtual environment in workspace..."
+            echo "SYNC: Source venv size: $(du -sh /${APP}/venv | cut -f1)"
+            echo "SYNC: Target directory: ${WORKSPACE_VENV_PATH}"
             cd "/workspace/${APP}-${DEFAULT_ENV}"
             
-            # Copy venv from container
-            echo "SYNC: Copying venv from container..."
+            # Copy venv from container with verbose progress
+            echo "SYNC: Copying venv from container (this may take a few minutes)..."
+            echo "SYNC: Starting copy at $(date)"
             cp -r "/${APP}/venv" "${WORKSPACE_VENV_PATH}"
+            echo "SYNC: Copy completed at $(date)"
+            echo "SYNC: Target venv size: $(du -sh ${WORKSPACE_VENV_PATH} | cut -f1)"
             
             echo "SYNC: Virtual environment created successfully"
         else
             echo "SYNC: Virtual environment already exists in workspace"
+            echo "SYNC: Existing venv size: $(du -sh ${WORKSPACE_VENV_PATH} | cut -f1)"
         fi
 
         # End the timer and calculate the duration

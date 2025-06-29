@@ -128,21 +128,18 @@ class ComfyUIEnvironmentInstaller:
         install_script = temp_dir / "install_comfyui.sh"
         
         try:
+            # Run installation with real-time output
+            logger.info("Starting installation script execution...")
             result = subprocess.run(
                 ['bash', str(install_script)],
                 env=env,
                 check=True,
-                capture_output=True,
                 text=True
             )
-            if result.stdout:
-                logger.info(result.stdout)
+            logger.info("Installation script completed successfully")
         except subprocess.CalledProcessError as e:
-            logger.error(f"Installation failed: {e}")
-            if e.stdout:
-                logger.error(f"stdout: {e.stdout}")
-            if e.stderr:
-                logger.error(f"stderr: {e.stderr}")
+            logger.error(f"Installation failed with exit code {e.returncode}")
+            logger.error("Check the output above for detailed error information")
             sys.exit(1)
             
     def create_shared_models_structure(self) -> None:
@@ -310,18 +307,16 @@ class ComfyUIEnvironmentInstaller:
             f.write(content)
             
         try:
+            # Run model download with real-time output
+            logger.info("Starting model download script execution...")
             result = subprocess.run(
                 ['bash', str(model_script)],
                 check=True,
-                capture_output=True,
                 text=True
             )
-            if result.stdout:
-                logger.info(result.stdout)
+            logger.info("Model download script completed successfully")
         except subprocess.CalledProcessError as e:
             logger.error(f"Model download failed: {e}")
-            if e.stderr:
-                logger.error(e.stderr)
             # Don't exit on model download failure
             
     def verify_installation(self) -> None:
