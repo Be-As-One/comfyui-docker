@@ -116,19 +116,19 @@ sync_apps() {
         start_time=$(date +%s)
 
         echo "SYNC: Sync 1 of 1"
-        # Get the current environment (defaults to comm)
-        COMFYUI_ENVIRONMENT=${COMFYUI_ENVIRONMENT:-"comm"}
+        # Sync the default built environment (determined at build time, not runtime)
+        DEFAULT_ENV=${WORKFLOW:-"comm"}
         # Use compression if enabled (default: true for better performance)
         USE_COMPRESSION=${USE_COMPRESSION:-true}
-        sync_directory "/${APP}" "/workspace/${APP}-${COMFYUI_ENVIRONMENT}" "${USE_COMPRESSION}"
+        sync_directory "/${APP}" "/workspace/${APP}-${DEFAULT_ENV}" "${USE_COMPRESSION}"
         save_template_json
-        echo "${VENV_PATH}" > "/workspace/${APP}-${COMFYUI_ENVIRONMENT}/venv_path"
+        echo "${VENV_PATH}" > "/workspace/${APP}-${DEFAULT_ENV}/venv_path"
         
         # Create venv in workspace if it doesn't exist
-        WORKSPACE_VENV_PATH="/workspace/${APP}-${COMFYUI_ENVIRONMENT}/venv"
+        WORKSPACE_VENV_PATH="/workspace/${APP}-${DEFAULT_ENV}/venv"
         if [ ! -d "${WORKSPACE_VENV_PATH}" ]; then
             echo "SYNC: Creating Python virtual environment in workspace..."
-            cd "/workspace/${APP}-${COMFYUI_ENVIRONMENT}"
+            cd "/workspace/${APP}-${DEFAULT_ENV}"
             
             # Copy venv from container
             echo "SYNC: Copying venv from container..."

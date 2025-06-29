@@ -167,7 +167,7 @@ jobs:
             -d '{
               "msg_type": "text",
               "content": {
-                "text": "🎉 ComfyUI Docker 构建成功！\n\n📦 构建目标: ${{ steps.target.outputs.BUILD_TARGET }}\n🏷️ 镜像标签: ${{ env.REGISTRY_USER }}/comfyui:${{ steps.target.outputs.BUILD_TARGET }}-v0.3.40-fastapi-v0.0.1\n🔗 仓库: ${{ github.repository }}\n📝 提交: ${{ github.sha }}\n👤 提交者: ${{ github.actor }}\n⏰ 构建时间: '"${BUILD_TIME}"'"
+                "text": "🎉 ComfyUI Docker 构建成功！\n\n📦 构建目标: ${{ steps.target.outputs.BUILD_TARGET }}\n🏷️ 镜像标签: ${{ env.REGISTRY_USER }}/comfyui:${{ steps.target.outputs.BUILD_TARGET }}-v0.3.40-fastapi-v0.0.8\n🔗 仓库: ${{ github.repository }}\n📝 提交: ${{ github.sha }}\n👤 提交者: ${{ github.actor }}\n⏰ 构建时间: '"${BUILD_TIME}"'"
               }
             }'
 
