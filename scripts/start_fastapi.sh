@@ -12,21 +12,29 @@ if [ ! -d "${COMFYUI_DIR}" ]; then
     exit 0
 fi
 
-# Check if FastAPI is installed
-if [ ! -d "${COMFYUI_DIR}/comfyui-fastapi" ]; then
-    echo "FASTAPI: comfyui-fastapi not found in ${COMFYUI_DIR}"
+# Use the centralized FastAPI code
+FASTAPI_DIR="/comfyui-fastapi"
+
+# Check if FastAPI code is available
+if [ ! -d "${FASTAPI_DIR}" ]; then
+    echo "FASTAPI: FastAPI code not found at ${FASTAPI_DIR}"
     echo "FASTAPI: Skipping FastAPI startup"
     exit 0
 fi
 
-cd "${COMFYUI_DIR}/comfyui-fastapi"
+cd "${FASTAPI_DIR}"
 
 # Check if venv exists
 if [ -f "${COMFYUI_DIR}/venv/bin/activate" ]; then
     source "${COMFYUI_DIR}/venv/bin/activate"
-    echo "FASTAPI: Starting FastAPI"
-    python main.py > /workspace/logs/fastapi.log 2>&1 &
-    echo "FASTAPI: FastAPI Started"
+    
+    # Set environment variables for multi-environment support
+    export DEFAULT_ENV=${COMFYUI_ENVIRONMENT}
+    export COMFYUI_ENVIRONMENT=${COMFYUI_ENVIRONMENT}
+    
+    echo "FASTAPI: Starting FastAPI for environment: ${COMFYUI_ENVIRONMENT}"
+    python main.py > /workspace/logs/fastapi-${COMFYUI_ENVIRONMENT}.log 2>&1 &
+    echo "FASTAPI: FastAPI Started for environment: ${COMFYUI_ENVIRONMENT}"
     deactivate
 else
     echo "FASTAPI: Virtual environment not found at ${COMFYUI_DIR}/venv"

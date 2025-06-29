@@ -1,6 +1,12 @@
 {
     "name": "aua-us",
     "description": "AUA US environment with controlnet and pose estimation",
+    "port": 3002,
+    "workflows": [
+        "controlnet_pose",
+        "inpainting_workflow",
+        "advanced_generation"
+    ],
     "nodes": [
         "ltdrdata/ComfyUI-Manager",
         "Kosinkadink/ComfyUI-Advanced-ControlNet",
