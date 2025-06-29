@@ -193,9 +193,9 @@ fi
 # Setup automatic cleanup
 if [ "${COMFYUI_CLEANUP_ENABLED:-true}" = "true" ]; then
     echo "Setting up automatic file cleanup..."
-    # Add cleanup task to crontab
-    (crontab -l 2>/dev/null | grep -v cleanup_comfyui_files; echo "* * * * * /cleanup_comfyui_files.sh >> /workspace/logs/cleanup.log 2>&1") | crontab -
-    echo "Cleanup task scheduled (input: ${INPUT_CLEANUP_MINUTES:-1} min, output: ${OUTPUT_CLEANUP_MINUTES:-60} min)"
+    # Add cleanup task to crontab (every 10 minutes)
+    (crontab -l 2>/dev/null | grep -v cleanup_comfyui_files; echo "*/30 * * * * /cleanup_comfyui_files.sh >> /workspace/logs/cleanup.log 2>&1") | crontab -
+    echo "Cleanup task scheduled every 10 minutes (input: ${INPUT_CLEANUP_MINUTES:-1} min, output: ${OUTPUT_CLEANUP_MINUTES:-60} min)"
 fi
 
 # Start FastAPI service
