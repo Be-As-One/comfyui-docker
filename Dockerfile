@@ -11,6 +11,10 @@ COPY --chmod=755 build/${WORKFLOW}/* ./
 # Copy all build scripts to /build/ directory for runtime use
 COPY --chmod=755 build/ /build/
 
+# Copy the scripts and config files needed by install scripts
+COPY --chmod=755 scripts/* ./
+COPY config/ /config/
+
 # Install ComfyUI
 ARG TORCH_VERSION
 ARG XFORMERS_VERSION
@@ -41,12 +45,6 @@ ENV TEMPLATE_VERSION=${RELEASE}
 ARG VENV_PATH
 ENV VENV_PATH=${VENV_PATH}
 
-# Copy the scripts
-WORKDIR /
-COPY --chmod=755 scripts/* ./
-
-# Copy configuration files
-COPY config/ /config/
 
 # Start the container
 SHELL ["/bin/bash", "--login", "-c"]
