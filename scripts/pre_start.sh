@@ -198,9 +198,6 @@ if [ "${COMFYUI_CLEANUP_ENABLED:-true}" = "true" ]; then
     echo "Cleanup task scheduled every 10 minutes (input: ${INPUT_CLEANUP_MINUTES:-1} min, output: ${OUTPUT_CLEANUP_MINUTES:-60} min)"
 fi
 
-# Start FastAPI service
-/start_fastapi.sh
-
 # ComfyUI auto-launch enabled by default to provide fallback FastAPI service
 DISABLE_AUTOLAUNCH=${DISABLE_AUTOLAUNCH:-false}
 
@@ -213,6 +210,9 @@ else
     echo "Starting ComfyUI automatically..."
     /start_comfyui.sh 0
 fi
+
+# Start FastAPI service after ComfyUI environment is ready
+/start_fastapi.sh
 
 echo "Pre-start initialization completed"
 
