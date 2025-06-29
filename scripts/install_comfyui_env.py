@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 class ComfyUIEnvironmentInstaller:
     """Manages the installation of ComfyUI environments"""
     
-    VALID_ENVIRONMENTS = ['comm']
+    VALID_ENVIRONMENTS = ['comm', 'aua-us', 'aua-sp']
     
     def __init__(self, environment: str, skip_models: bool = False):
         self.environment = environment
@@ -87,10 +87,21 @@ class ComfyUIEnvironmentInstaller:
             
         # Replace /ComfyUI with environment-specific path (but not in Git URLs)
         import re
-        # Replace /ComfyUI at the end of commands (target paths) but not in URLs
-        content = re.sub(r'(/ComfyUI)(?=\s|$)', str(self.env_dir), content)
-        # Also handle specific git clone pattern to avoid replacing URLs
-        content = re.sub(r'(git clone .+?\.git)\s+/workspace/ComfyUI-\w+', r'\1 ' + str(self.env_dir), content)
+        # Split into lines and process each line separately to avoid regex issues
+        lines = content.split('\n')
+        modified_lines = []
+        
+        for line in lines:
+            # Skip git clone lines entirely
+            if 'git clone' in line and '/ComfyUI' in line:
+                # Replace only the target path in git clone
+                line = re.sub(r'(git clone .+?\.git)\s+/ComfyUI', r'\1 ' + str(self.env_dir), line)
+            else:
+                # Replace /ComfyUI in other contexts
+                line = re.sub(r'/ComfyUI(?=\s|$)', str(self.env_dir), line)
+            modified_lines.append(line)
+        
+        content = '\n'.join(modified_lines)
         
         with open(install_script, 'w') as f:
             f.write(content)
@@ -103,14 +114,16 @@ class ComfyUIEnvironmentInstaller:
         env = os.environ.copy()
         env.update({
             'COMFYUI_VERSION': os.getenv('COMFYUI_COMMIT', 'master'),
-            'TORCH_VERSION': os.getenv('TORCH_VERSION', '2.1.0+cu121'),
-            'XFORMERS_VERSION': os.getenv('XFORMERS_VERSION', '0.0.22.post7')
+            'TORCH_VERSION': os.getenv('TORCH_VERSION', '2.6.0+cu124'),
+            'XFORMERS_VERSION': os.getenv('XFORMERS_VERSION', '0.0.29.post3'),
+            'INDEX_URL': os.getenv('INDEX_URL', 'https://download.pytorch.org/whl/cu124')
         })
         
         logger.info(f"Running environment-specific installation...")
         logger.info(f"COMFYUI_VERSION={env['COMFYUI_VERSION']}")
         logger.info(f"TORCH_VERSION={env['TORCH_VERSION']}")
         logger.info(f"XFORMERS_VERSION={env['XFORMERS_VERSION']}")
+        logger.info(f"INDEX_URL={env['INDEX_URL']}")
         
         install_script = temp_dir / "install_comfyui.sh"
         
@@ -277,12 +290,19 @@ class ComfyUIEnvironmentInstaller:
             
         logger.info(f"Downloading models for {self.environment}...")
         
-        # Modify model download script to use shared models directory
+        # Modify model download script to use correct paths
         with open(model_script, 'r') as f:
             content = f.read()
             
+        # Replace /workspace/ComfyUI with environment-specific path
         content = content.replace(
-            '/workspace/ComfyUI/models', 
+            '/workspace/ComfyUI',
+            str(self.env_dir)
+        )
+        
+        # Also replace models directory with shared models
+        content = content.replace(
+            f'{self.env_dir}/models', 
             str(self.shared_models_dir)
         )
         

@@ -41,3 +41,31 @@ git clone https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes.git \
 
 git clone https://github.com/ShmuelRonen/ComfyUI-Gemini_Flash_2.0_Exp.git \
   /workspace/ComfyUI/custom_nodes/ComfyUI-Gemini_Flash_2.0_Exp
+
+
+
+git clone https://github.com/kijai/ComfyUI-KJNodes.git \
+  /workspace/ComfyUI/custom_nodes/ComfyUI-KJNodes
+cd  /workspace/ComfyUI/custom_nodes/ComfyUI-KJNodes
+pip3 install -r requirements.txt
+
+git clone https://github.com/WaddingtonHoldings/ComfyUI-InstaSD.git \
+  /workspace/ComfyUI/custom_nodes/ComfyUI-InstaSD 
+cd  /workspace/ComfyUI/custom_nodes/ComfyUI-InstaSD 
+pip3 install -r requirements.txt
+
+
+
+## 下载模型
+curl -L "https://huggingface.co/comfyanonymous/ControlNet-v1-1_fp16_safetensors/resolve/main/control_v11p_sd15_openpose_fp16.safetensors"   -o "/workspace/shared-models/controlnet/control_v11p_sd15_openpose_fp16.safetensors"
+
+
+huggingface-cli download dputilov/exp \
+  epicrealism_v10-inpainting.safetensors \
+  --repo-type dataset \
+  --local-dir /workspace/shared-models/checkpoints
+
+
+
+curl -L "https://huggingface.co/ByteDance/Hyper-SD/resolve/main/Hyper-SD15-8steps-lora.safetensors" \
+  -o /workspace/shared-models/loras/Hyper-SD15-8steps-lora.safetensors

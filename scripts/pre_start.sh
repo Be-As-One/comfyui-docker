@@ -180,11 +180,19 @@ fi
 # cd /app-manager
 # npm start > /workspace/logs/app-manager.log 2>&1 &
 
+# Setup automatic cleanup
+if [ "${COMFYUI_CLEANUP_ENABLED:-true}" = "true" ]; then
+    echo "Setting up automatic file cleanup..."
+    # Add cleanup task to crontab
+    (crontab -l 2>/dev/null | grep -v cleanup_comfyui_files; echo "* * * * * /cleanup_comfyui_files.sh >> /workspace/logs/cleanup.log 2>&1") | crontab -
+    echo "Cleanup task scheduled (input: ${INPUT_CLEANUP_MINUTES:-1} min, output: ${OUTPUT_CLEANUP_MINUTES:-60} min)"
+fi
+
 # Start FastAPI service
 /start_fastapi.sh
 
 # ComfyUI auto-launch enabled by default to provide fallback FastAPI service
-DISABLE_AUTOLAUNCH=${DISABLE_AUTOLAUNCH:-true}
+DISABLE_AUTOLAUNCH=${DISABLE_AUTOLAUNCH:-false}
 
 if [[ ${DISABLE_AUTOLAUNCH} == "true" ]]
 then

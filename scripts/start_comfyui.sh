@@ -1,6 +1,30 @@
 #!/usr/bin/env bash
 export PYTHONUNBUFFERED=1
 
+# Check if first argument is 'status'
+if [[ "$1" == "status" ]]; then
+    echo "=== ComfyUI Instance Status ==="
+    echo ""
+    found=0
+    for i in {0..9}; do
+        PID_FILE="/workspace/logs/comfyui_instance_${i}.pid"
+        if [ -f "$PID_FILE" ]; then
+            PID=$(cat "$PID_FILE")
+            if ps -p "$PID" > /dev/null 2>&1; then
+                PORT=$((3001 + i))
+                # Get environment from process
+                ENV_DIR=$(ps -p "$PID" -o args= | grep -oP '/workspace/ComfyUI-\K[^/]+' || echo "unknown")
+                echo "Instance $i: Running (PID: $PID, Port: $PORT, Environment: $ENV_DIR)"
+                found=1
+            fi
+        fi
+    done
+    if [ $found -eq 0 ]; then
+        echo "No ComfyUI instances are currently running."
+    fi
+    exit 0
+fi
+
 # Parse command line arguments
 INSTANCE_ID=${1:-0}
 EXTRA_ARGS=${2:-""}
