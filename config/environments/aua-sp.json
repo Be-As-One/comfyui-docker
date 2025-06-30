@@ -2,12 +2,7 @@
     "name": "aua-sp",
     "description": "AUA SP environment with extensive models and nodes",
     "port": 3003,
-    "workflows": [
-        "instant_id",
-        "face_swap",  
-        "advanced_inpainting",
-        "brushnet_workflow"
-    ],
+    "workflows": [],
     "nodes": [
         "ltdrdata/ComfyUI-Manager",
         "cubiq/ComfyUI_InstantID",
