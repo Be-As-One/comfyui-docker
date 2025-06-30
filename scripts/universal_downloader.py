@@ -120,17 +120,36 @@ class UniversalDownloader:
             
         logger.info(f"→ Installing requirements for {node_dir.name}")
         
+        # 确定环境目录和虚拟环境路径
+        env_dir = self.comfyui_path  # 使用当前环境的 ComfyUI 路径
+        venv_pip = env_dir / "venv" / "bin" / "pip"
+        
+        if not venv_pip.exists():
+            logger.error(f"Virtual environment pip not found: {venv_pip}")
+            logger.warning(f"  Falling back to system pip for {node_dir.name}")
+            # 继续使用系统 pip，不阻止整体安装
+            pip_cmd = 'pip3'
+            env_vars = None
+        else:
+            logger.debug(f"Using virtual environment pip: {venv_pip}")
+            pip_cmd = str(venv_pip)
+            # 设置虚拟环境变量
+            env_vars = os.environ.copy()
+            env_vars['VIRTUAL_ENV'] = str(env_dir / "venv")
+            env_vars['PATH'] = f"{env_dir / 'venv' / 'bin'}:{env_vars.get('PATH', '')}"
+        
         try:
-            # Change to the node directory and install requirements
+            # 使用正确的 pip 安装依赖
             result = subprocess.run([
-                'pip3', 'install', '-r', 'requirements.txt'
-            ], cwd=node_dir, check=True, capture_output=True, text=True)
+                pip_cmd, 'install', '-r', 'requirements.txt'
+            ], cwd=node_dir, check=True, capture_output=True, text=True, env=env_vars)
             
             logger.info(f"✓ Requirements installed for {node_dir.name}")
             return True
             
         except subprocess.CalledProcessError as e:
             logger.error(f"✗ Requirements installation failed for {node_dir.name}")
+            logger.warning(f"  Error: {e.stderr if e.stderr else str(e)}")
             logger.warning(f"  Node may still be functional, continuing...")
             # 只警告，不阻止整体安装
             return True
