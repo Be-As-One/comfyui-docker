@@ -351,7 +351,7 @@ class ComfyUIEnvironmentInstaller:
         
         try:
             # Activate venv and run the fix script
-            cmd = f"cd {self.env_dir} && source venv/bin/activate && bash {fix_script}"
+            cmd = f"cd {self.env_dir} && . venv/bin/activate && bash {fix_script}"
             result = subprocess.run(cmd, shell=True, check=True, text=True, capture_output=True)
             logger.info("Dependency fixes completed successfully")
             if result.stdout:
