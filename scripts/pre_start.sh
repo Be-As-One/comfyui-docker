@@ -198,6 +198,16 @@ if [ "${COMFYUI_CLEANUP_ENABLED:-true}" = "true" ]; then
     echo "Cleanup task scheduled every 10 minutes (input: ${INPUT_CLEANUP_MINUTES:-1} min, output: ${OUTPUT_CLEANUP_MINUTES:-60} min)"
 fi
 
+# Update nginx configuration for dynamic routing
+echo "Updating nginx configuration for dynamic routing..."
+python3 /generate_nginx_config.py
+
+# Reload nginx configuration
+if command -v nginx >/dev/null 2>&1; then
+    echo "Reloading nginx configuration..."
+    nginx -s reload 2>/dev/null || echo "Nginx not running yet, configuration will be loaded on start"
+fi
+
 # ComfyUI auto-launch enabled by default to provide fallback FastAPI service
 DISABLE_AUTOLAUNCH=${DISABLE_AUTOLAUNCH:-false}
 
