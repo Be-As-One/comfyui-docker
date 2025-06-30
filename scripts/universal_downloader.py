@@ -55,37 +55,185 @@ class UniversalDownloader:
         """Ensure directory exists"""
         path.parent.mkdir(parents=True, exist_ok=True)
     
-    def download_file(self, url: str, target_path: Path) -> bool:
-        """Download file with progress indication"""
+    def download_file(self, url: str, target_path: Path, model_config: dict = None) -> bool:
+        """Download file with progress indication and configurable source"""
         self.ensure_directory(target_path)
         
+        # 检查现有文件是否完整（大于1MB）
         if target_path.exists():
-            logger.info(f"✓ Already exists: {target_path.name}")
-            return True
+            file_size = target_path.stat().st_size
+            if file_size > 1024 * 1024:  # > 1MB，认为是完整文件
+                logger.info(f"✓ Already exists: {target_path.name} ({file_size/1024/1024:.1f}MB)")
+                return True
+            else:
+                logger.warning(f"Found incomplete file, re-downloading: {target_path.name} ({file_size} bytes)")
+                target_path.unlink()
             
         logger.info(f"→ Downloading: {target_path.name}")
         logger.info(f"  From: {url}")
         logger.info(f"  To: {target_path}")
         
+        # 获取下载源配置
+        source = "auto"
+        if model_config:
+            source = model_config.get("source", "auto")
+        
         try:
-            # Use curl for better compatibility and progress
-            result = subprocess.run([
-                'curl', '-L', '-o', str(target_path), url
-            ], check=True, capture_output=True, text=True)
-            
-            if target_path.exists() and target_path.stat().st_size > 0:
-                logger.info(f"✓ Downloaded: {target_path.name}")
-                return True
-            else:
-                logger.error(f"✗ Download failed: {target_path.name}")
-                if target_path.exists():
-                    target_path.unlink()
-                return False
-                
-        except subprocess.CalledProcessError as e:
+            return self._download_with_source(url, target_path, source, model_config)
+        except Exception as e:
             logger.error(f"✗ Download failed: {e}")
             if target_path.exists():
                 target_path.unlink()
+            return False
+    
+    def _download_with_source(self, url: str, target_path: Path, source: str, model_config: dict) -> bool:
+        """根据配置的源进行下载"""
+        logger.info(f"  Using download source: {source}")
+        
+        if source == "auto":
+            # 自动检测下载源
+            if "huggingface.co" in url:
+                return self._download_from_huggingface(url, target_path, model_config)
+            elif "civitai.com" in url:
+                return self._download_from_civitai(url, target_path, model_config)
+            else:
+                return self._download_with_curl(url, target_path, model_config)
+        
+        elif source == "huggingface-cli":
+            return self._download_from_huggingface(url, target_path, model_config)
+        
+        elif source == "civitai":
+            return self._download_from_civitai(url, target_path, model_config)
+        
+        elif source == "curl":
+            return self._download_with_curl(url, target_path, model_config)
+        
+        else:
+            logger.error(f"Unsupported download source: {source}")
+            return False
+    
+    def _download_from_huggingface(self, url: str, target_path: Path, model_config: dict = None) -> bool:
+        """Download from Hugging Face using Python API with curl fallback"""
+        try:
+            # 尝试使用 huggingface_hub Python API
+            try:
+                from huggingface_hub import hf_hub_download
+                logger.info("Using huggingface_hub Python API")
+            except ImportError:
+                logger.warning("huggingface_hub not available, falling back to curl")
+                return self._download_with_curl(url, target_path, model_config)
+            
+            # 解析 Hugging Face URL
+            # URL格式: https://huggingface.co/user/repo/resolve/main/file.safetensors
+            parts = url.split('/')
+            if len(parts) < 6:
+                raise ValueError(f"Invalid Hugging Face URL format: {url}")
+            
+            repo_id = f"{parts[3]}/{parts[4]}"  # user/repo
+            filename = parts[-1]  # file.safetensors
+            
+            # 获取 repo_type，默认为 "model"
+            repo_type = "model"
+            if model_config:
+                # 新格式：download_params.repo_type
+                if model_config.get("download_params") and model_config["download_params"].get("repo_type"):
+                    repo_type = model_config["download_params"]["repo_type"]
+                # 兼容旧格式：直接的 repo_type
+                elif model_config.get("repo_type"):
+                    repo_type = model_config["repo_type"]
+            
+            logger.info(f"Downloading from repo: {repo_id}, file: {filename}, repo_type: {repo_type}")
+            
+            # 使用 huggingface_hub 下载
+            downloaded_path = hf_hub_download(
+                repo_id=repo_id,
+                filename=filename,
+                repo_type=repo_type,
+                local_dir=str(target_path.parent),
+                local_dir_use_symlinks=False
+            )
+            
+            # 验证下载结果
+            if target_path.exists():
+                file_size = target_path.stat().st_size
+                if file_size > 1024:  # 至少1KB
+                    logger.info(f"✓ Downloaded: {target_path.name} ({file_size/1024/1024:.1f}MB)")
+                    return True
+                else:
+                    logger.error(f"✗ Downloaded file too small: {target_path.name} ({file_size} bytes)")
+                    target_path.unlink()
+                    return False
+            else:
+                logger.error(f"✗ File not found after download: {target_path}")
+                return False
+                
+        except Exception as e:
+            logger.error(f"✗ Hugging Face API download failed: {e}")
+            logger.warning("Falling back to curl download")
+            return self._download_with_curl(url, target_path, model_config)
+    
+    def _download_with_curl(self, url: str, target_path: Path, model_config: dict = None) -> bool:
+        """Download with curl as fallback"""
+        try:
+            # 使用更强健的 curl 参数
+            result = subprocess.run([
+                'curl', '-L', '-f', '--fail-with-body', '--progress-bar',
+                '-o', str(target_path), url
+            ], check=True, capture_output=True, text=True)
+            
+            # 验证下载结果
+            if target_path.exists():
+                file_size = target_path.stat().st_size
+                if file_size > 1024:  # 至少1KB
+                    logger.info(f"✓ Downloaded: {target_path.name} ({file_size/1024/1024:.1f}MB)")
+                    return True
+                else:
+                    logger.error(f"✗ Downloaded file too small: {target_path.name} ({file_size} bytes)")
+                    target_path.unlink()
+                    return False
+            else:
+                logger.error(f"✗ File not found after download: {target_path}")
+                return False
+                
+        except subprocess.CalledProcessError as e:
+            logger.error(f"✗ curl download failed: {e}")
+            return False
+    
+    def _download_from_civitai(self, url: str, target_path: Path, model_config: dict = None) -> bool:
+        """Download from Civitai with API token support"""
+        try:
+            # 构建 curl 命令
+            curl_cmd = ['curl', '-L', '-f', '--fail-with-body', '--progress-bar']
+            
+            # 添加 API token（如果配置了）
+            if model_config and model_config.get("api_token"):
+                curl_cmd.extend(['-H', f'Authorization: Bearer {model_config["api_token"]}'])
+            
+            # 添加自定义 headers（如果配置了）
+            if model_config and model_config.get("headers"):
+                for key, value in model_config["headers"].items():
+                    curl_cmd.extend(['-H', f'{key}: {value}'])
+            
+            curl_cmd.extend(['-o', str(target_path), url])
+            
+            result = subprocess.run(curl_cmd, check=True, capture_output=True, text=True)
+            
+            # 验证下载结果
+            if target_path.exists():
+                file_size = target_path.stat().st_size
+                if file_size > 1024:  # 至少1KB
+                    logger.info(f"✓ Downloaded: {target_path.name} ({file_size/1024/1024:.1f}MB)")
+                    return True
+                else:
+                    logger.error(f"✗ Downloaded file too small: {target_path.name} ({file_size} bytes)")
+                    target_path.unlink()
+                    return False
+            else:
+                logger.error(f"✗ File not found after download: {target_path}")
+                return False
+                
+        except subprocess.CalledProcessError as e:
+            logger.error(f"✗ Civitai download failed: {e}")
             return False
     
     def clone_repository(self, repo_url: str, target_dir: Path) -> bool:
@@ -227,7 +375,7 @@ class UniversalDownloader:
                     model_type = model_config.get('type') or self.infer_model_type(url, filename)
                     target_path = self.shared_models_path / model_type / filename
             
-            if self.download_file(url, target_path):
+            if self.download_file(url, target_path, model_config):
                 success_count += 1
         
         logger.info(f"Models: {success_count}/{total_count} downloaded successfully")

@@ -24,15 +24,24 @@
     "models": [
         {
             "url": "https://huggingface.co/comfyanonymous/ControlNet-v1-1_fp16_safetensors/resolve/main/control_v11p_sd15_openpose_fp16.safetensors",
-            "type": "controlnet"
+            "type": "controlnet",
+            "source": "huggingface-cli",
+            "filename": "control_v11p_sd15_openpose_fp16.safetensors"
         },
         {
             "url": "https://huggingface.co/dputilov/exp/resolve/main/epicrealism_v10-inpainting.safetensors",
-            "type": "checkpoints"
+            "type": "checkpoints",
+            "source": "huggingface-cli",
+            "filename": "epicrealism_v10-inpainting.safetensors",
+            "download_params": {
+                "repo_type": "dataset"
+            }
         },
         {
             "url": "https://huggingface.co/ByteDance/Hyper-SD/resolve/main/Hyper-SD15-8steps-lora.safetensors",
-            "type": "loras"
+            "type": "loras",
+            "source": "huggingface-cli",
+            "filename": "Hyper-SD15-8steps-lora.safetensors"
         }
     ]
 }
