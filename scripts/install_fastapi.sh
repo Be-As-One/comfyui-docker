@@ -3,13 +3,12 @@ set -e
 
 echo "Installing ComfyUI-FastAPI..."
 
-# Create workspace directory and install FastAPI there
-mkdir -p /workspace
-cd /workspace
+# Install FastAPI in root directory
+cd /
 
 # Check if directory already exists
 if [ -d "comfyui-fastapi" ]; then
-    echo "Directory /workspace/comfyui-fastapi already exists. Removing it..."
+    echo "Directory /comfyui-fastapi already exists. Removing it..."
     rm -rf comfyui-fastapi
 fi
 
@@ -23,7 +22,7 @@ cd comfyui-fastapi
 
 # Check if requirements.txt exists before installing
 if [ ! -f "requirements.txt" ]; then
-    echo "Warning: requirements.txt not found in /workspace/comfyui-fastapi"
+    echo "Warning: requirements.txt not found in /comfyui-fastapi"
     echo "Skipping pip install step"
 else
     # Install requirements in the base Python environment with error handling
@@ -33,4 +32,4 @@ else
     fi
 fi
 
-echo "ComfyUI-FastAPI installation completed at /workspace/comfyui-fastapi"
+echo "ComfyUI-FastAPI installation completed at /comfyui-fastapi"

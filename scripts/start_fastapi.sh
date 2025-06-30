@@ -13,7 +13,7 @@ if [ ! -d "${COMFYUI_DIR}" ]; then
 fi
 
 # Use the centralized FastAPI code
-FASTAPI_DIR="/workspace/comfyui-fastapi"
+FASTAPI_DIR="/comfyui-fastapi"
 
 # Check if FastAPI code is available
 if [ ! -d "${FASTAPI_DIR}" ]; then
