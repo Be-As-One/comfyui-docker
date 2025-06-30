@@ -54,15 +54,13 @@ LOG_FILE="/workspace/logs/comfyui_instance_${INSTANCE_ID}.log"
 # Ensure logs directory exists
 mkdir -p "/workspace/logs"
 
-# Check if environment is installed, install if not
-if [[ ! -d "${COMFYUI_DIR}" || ! -f "${COMFYUI_DIR}/main.py" ]]; then
-    echo "COMFYUI: Environment ${COMFYUI_ENVIRONMENT} not found. Installing..."
-    /install_comfyui_env.py "${COMFYUI_ENVIRONMENT}"
-    
-    if [[ $? -ne 0 ]]; then
-        echo "COMFYUI: ERROR - Failed to install environment ${COMFYUI_ENVIRONMENT}"
-        exit 1
-    fi
+# Ensure environment is complete and up-to-date
+echo "COMFYUI: Ensuring environment ${COMFYUI_ENVIRONMENT} is complete..."
+/install_comfyui_env.py "${COMFYUI_ENVIRONMENT}"
+
+if [[ $? -ne 0 ]]; then
+    echo "COMFYUI: ERROR - Failed to install environment ${COMFYUI_ENVIRONMENT}"
+    exit 1
 fi
 
 # Verify ComfyUI directory exists after installation
