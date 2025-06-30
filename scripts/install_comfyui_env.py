@@ -346,6 +346,22 @@ class ComfyUIEnvironmentInstaller:
         
         # Check if already installed
         if self.check_existing_installation():
+            # Environment exists, but ensure shared models and custom nodes are complete
+            logger.info("Environment exists, ensuring shared models and custom nodes are complete...")
+            self.setup_shared_models()
+            
+            # Download custom nodes and models using universal downloader
+            try:
+                import subprocess
+                logger.info(f"Running universal downloader for {self.environment}...")
+                result = subprocess.run([
+                    'python3', '/universal_downloader.py', self.environment
+                ], check=True, text=True)
+                logger.info("Universal downloader completed successfully")
+            except subprocess.CalledProcessError as e:
+                logger.error(f"Universal downloader failed: {e}")
+                # Continue anyway, some downloads might have succeeded
+            
             return
             
         # Check build scripts exist
