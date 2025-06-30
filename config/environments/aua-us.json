@@ -4,7 +4,7 @@
     "port": 3002,
     "workflows": [
         "clothes_prompt_changer_with_auto",
-        "clothes_prompt_changer_with_mask",
+        "clothes_prompt_changer_with_mask"
     ],
     "nodes": [
         "ltdrdata/ComfyUI-Manager",

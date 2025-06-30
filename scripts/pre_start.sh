@@ -120,8 +120,8 @@ sync_apps() {
         start_time=$(date +%s)
 
         echo "SYNC: Sync 1 of 1"
-        # Sync the default built environment (determined at build time, not runtime)
-        DEFAULT_ENV=${WORKFLOW:-"comm"}
+        # Sync the default built environment (use runtime environment)
+        DEFAULT_ENV=${COMFYUI_ENVIRONMENT:-"comm"}
         # Use compression if enabled (default: true for better performance)
         USE_COMPRESSION=${USE_COMPRESSION:-true}
         sync_directory "/${APP}" "/workspace/${APP}-${DEFAULT_ENV}" "${USE_COMPRESSION}"
