@@ -347,19 +347,65 @@ class ComfyUIEnvironmentInstaller:
             logger.warning(f"No fix_dependencies.sh found for {self.environment}")
             return
             
-        logger.info(f"Running dependency fixes for {self.environment}...")
+        # Check if virtual environment exists
+        venv_pip = self.env_dir / "venv" / "bin" / "pip"
+        if not venv_pip.exists():
+            logger.error(f"Virtual environment pip not found: {venv_pip}")
+            return
+            
+        logger.info("=" * 60)
+        logger.info(f"🔧 Running dependency fixes for environment: {self.environment}")
+        logger.info(f"📁 Working directory: {self.env_dir}")
+        logger.info(f"🐍 Virtual environment: {self.env_dir / 'venv'}")
+        logger.info(f"📜 Fix script: {fix_script}")
+        logger.info("=" * 60)
         
         try:
-            # Activate venv and run the fix script
-            cmd = f"cd {self.env_dir} && . venv/bin/activate && bash {fix_script}"
-            result = subprocess.run(cmd, shell=True, check=True, text=True, capture_output=True)
-            logger.info("Dependency fixes completed successfully")
+            # Run the fix script with proper environment variables and working directory
+            env = os.environ.copy()
+            env['VIRTUAL_ENV'] = str(self.env_dir / "venv")
+            env['PATH'] = f"{self.env_dir / 'venv' / 'bin'}:{env.get('PATH', '')}"
+            
+            cmd = f"bash {fix_script}"
+            logger.info(f"🚀 Executing command: {cmd}")
+            
+            result = subprocess.run(
+                cmd, 
+                shell=True, 
+                check=True, 
+                text=True, 
+                capture_output=True,
+                cwd=str(self.env_dir),
+                env=env
+            )
+            
+            logger.info("=" * 60)
+            logger.info("✅ Dependency fixes completed successfully")
             if result.stdout:
-                logger.debug(f"Output: {result.stdout}")
+                logger.info("📋 Command output:")
+                for line in result.stdout.strip().split('\n'):
+                    if line.strip():
+                        logger.info(f"   {line}")
+            logger.info("=" * 60)
+            
         except subprocess.CalledProcessError as e:
-            logger.error(f"Dependency fix failed: {e}")
+            logger.error("=" * 60)
+            logger.error(f"❌ Dependency fix failed with exit code: {e.returncode}")
+            logger.error(f"🚀 Command executed: {cmd}")
+            logger.error(f"📁 Working directory: {self.env_dir}")
+            
             if e.stderr:
-                logger.error(f"Error output: {e.stderr}")
+                logger.error("📋 Error output:")
+                for line in e.stderr.strip().split('\n'):
+                    if line.strip():
+                        logger.error(f"   {line}")
+                        
+            if e.stdout:
+                logger.error("📋 Standard output:")
+                for line in e.stdout.strip().split('\n'):
+                    if line.strip():
+                        logger.error(f"   {line}")
+            logger.error("=" * 60)
             raise
             
     def install(self) -> None:
