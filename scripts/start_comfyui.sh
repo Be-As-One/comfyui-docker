@@ -34,7 +34,18 @@ COMFYUI_ENVIRONMENT=${COMFYUI_ENVIRONMENT:-"comm"}
 COMFYUI_DIR="/workspace/ComfyUI-${COMFYUI_ENVIRONMENT}"
 
 # Instance configuration
-INSTANCE_PORT=${INSTANCE_PORT:-$((${COMFYUI_BASE_PORT:-3001} + INSTANCE_ID))}
+# Read port from environment configuration file
+ENV_CONFIG="/config/environments/${COMFYUI_ENVIRONMENT}.json"
+if [ -f "${ENV_CONFIG}" ]; then
+    BASE_PORT=$(python3 -c "import json; print(json.load(open('${ENV_CONFIG}'))['port'])")
+    echo "Using port ${BASE_PORT} from environment config: ${COMFYUI_ENVIRONMENT}"
+else
+    # Fallback to default port
+    BASE_PORT=${COMFYUI_BASE_PORT:-3001}
+    echo "Environment config not found, using default port: ${BASE_PORT}"
+fi
+
+INSTANCE_PORT=${INSTANCE_PORT:-$((BASE_PORT + INSTANCE_ID))}
 INSTANCE_NAME=${INSTANCE_NAME:-"instance_${INSTANCE_ID}"}
 
 # Calculate instance-specific values
