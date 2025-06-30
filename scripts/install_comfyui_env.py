@@ -373,19 +373,13 @@ class ComfyUIEnvironmentInstaller:
                 cmd, 
                 shell=True, 
                 check=True, 
-                text=True, 
-                capture_output=True,
+                text=True,
                 cwd=str(self.env_dir),
                 env=env
             )
             
             logger.info("=" * 60)
             logger.info("✅ Dependency fixes completed successfully")
-            if result.stdout:
-                logger.info("📋 Command output:")
-                for line in result.stdout.strip().split('\n'):
-                    if line.strip():
-                        logger.info(f"   {line}")
             logger.info("=" * 60)
             
         except subprocess.CalledProcessError as e:
@@ -393,18 +387,6 @@ class ComfyUIEnvironmentInstaller:
             logger.error(f"❌ Dependency fix failed with exit code: {e.returncode}")
             logger.error(f"🚀 Command executed: {cmd}")
             logger.error(f"📁 Working directory: {self.env_dir}")
-            
-            if e.stderr:
-                logger.error("📋 Error output:")
-                for line in e.stderr.strip().split('\n'):
-                    if line.strip():
-                        logger.error(f"   {line}")
-                        
-            if e.stdout:
-                logger.error("📋 Standard output:")
-                for line in e.stdout.strip().split('\n'):
-                    if line.strip():
-                        logger.error(f"   {line}")
             logger.error("=" * 60)
             raise
             
