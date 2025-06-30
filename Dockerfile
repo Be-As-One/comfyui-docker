@@ -23,6 +23,9 @@ ARG COMFYUI_COMMIT
 # RUN mv ./requirements.txt ./ComfyUI/requirements.txt
 RUN /install_comfyui.sh
 
+# Install FastAPI (shared across all environments)
+RUN /install_fastapi.sh
+
 
 # Install CivitAI Model Downloader
 ARG CIVITAI_DOWNLOADER_VERSION
