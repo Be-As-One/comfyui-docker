@@ -35,10 +35,10 @@ python3 /universal_downloader.py aua-us
 
 
 
-# Install ComfyUI-FastAPI
-cd /ComfyUI
+# Install ComfyUI-FastAPI to workspace location
+cd /workspace
 git clone https://github.com/Be-As-One/comfyui-fastapi.git 
-cd /ComfyUI/comfyui-fastapi
+cd /workspace/comfyui-fastapi
 pip3 install -r requirements.txt
 
 pip3 cache purge

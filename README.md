@@ -261,6 +261,43 @@ You can obviously substitute the image name and tag with your own.
 
 The container exposes a FastAPI service on port 8001 for managing ComfyUI instances externally.
 
+### FastAPI Task Workflow System
+
+The FastAPI service includes an intelligent task routing system that automatically distributes tasks to the appropriate ComfyUI environment based on workflow type:
+
+#### Task Structure
+When fetching a task via `/comfyui-fetch-task`, the system returns:
+```json
+{
+    "taskId": "task_xxx",
+    "workflow_name": "clothes_prompt_changer_with_auto",  // Workflow identifier
+    "environment": "aua-us",                              // Target environment (auto-determined)
+    "target_port": 3002,                                  // ComfyUI port (auto-determined)
+    "params": {
+        "input_data": {
+            "wf_json": {...}  // Actual workflow JSON content
+        }
+    },
+    "status": "PENDING"
+}
+```
+
+**Note**: The `environment` and `target_port` fields are automatically determined by the system based on the `workflow_name`. They are output fields that inform the caller which environment and port to use for executing the workflow.
+
+#### Workflow Routing Configuration
+The system uses environment configuration files (`/config/environments/*.json`) to map workflows to specific environments:
+- `clothes_prompt_changer_with_auto` → `aua-us` (port 3002)
+- `clothes_prompt_changer_with_mask` → `aua-us` (port 3002)
+- Other workflows → Assigned based on configuration
+
+#### Task API Endpoints
+- `GET /comfyui-fetch-task` - Fetch next pending task
+- `POST /comfyui-update-task` - Update task status
+- `GET /tasks` - List all tasks
+- `POST /tasks/create/{workflow_name}` - Create task for specific workflow
+- `GET /workflows` - Get available workflows and mappings
+- `GET /environments` - Get environment configurations
+
 ### Start Single Instance
 
 ```bash

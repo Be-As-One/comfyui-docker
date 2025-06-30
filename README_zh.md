@@ -259,6 +259,43 @@ docker run -d \
 
 容器在端口 8001 上暴露 FastAPI 服务，用于外部管理 ComfyUI 实例。
 
+### FastAPI 任务工作流系统
+
+FastAPI 服务包含智能任务路由系统，根据工作流类型自动将任务分配到相应的 ComfyUI 环境：
+
+#### 任务结构
+通过 `/comfyui-fetch-task` 获取任务时，系统返回：
+```json
+{
+    "taskId": "task_xxx",
+    "workflow_name": "clothes_prompt_changer_with_auto",  // 工作流标识符
+    "environment": "aua-us",                              // 目标环境（系统自动确定）
+    "target_port": 3002,                                  // ComfyUI 端口（系统自动确定）
+    "params": {
+        "input_data": {
+            "wf_json": {...}  // 实际的工作流 JSON 内容
+        }
+    },
+    "status": "PENDING"
+}
+```
+
+**注意**：`environment` 和 `target_port` 字段是系统根据 `workflow_name` 自动确定的。它们是输出字段，用于告知调用方应该使用哪个环境和端口来执行工作流。
+
+#### 工作流路由配置
+系统使用环境配置文件（`/config/environments/*.json`）将工作流映射到特定环境：
+- `clothes_prompt_changer_with_auto` → `aua-us` (端口 3002)
+- `clothes_prompt_changer_with_mask` → `aua-us` (端口 3002)
+- 其他工作流 → 根据配置分配
+
+#### 任务 API 端点
+- `GET /comfyui-fetch-task` - 获取下一个待处理任务
+- `POST /comfyui-update-task` - 更新任务状态
+- `GET /tasks` - 列出所有任务
+- `POST /tasks/create/{workflow_name}` - 为特定工作流创建任务
+- `GET /workflows` - 获取可用工作流和映射关系
+- `GET /environments` - 获取环境配置
+
 ### 启动单个实例
 
 ```bash
