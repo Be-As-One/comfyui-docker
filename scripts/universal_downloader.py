@@ -36,7 +36,7 @@ class UniversalDownloader:
         
     def load_config(self) -> dict:
         """Load environment configuration"""
-        config_file = Path(__file__).parent.parent / "config" / "environments" / f"{self.environment}.json"
+        config_file = Path(__file__).parent.parent / "config" / "environments" / self.environment / "config.json"
         
         if not config_file.exists():
             logger.error(f"Configuration file not found: {config_file}")

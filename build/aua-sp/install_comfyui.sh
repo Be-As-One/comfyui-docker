@@ -25,13 +25,4 @@ git clone https://github.com/ltdrdata/ComfyUI-Manager.git custom_nodes/ComfyUI-M
 cd custom_nodes/ComfyUI-Manager
 pip3 install -r requirements.txt
 
-# Download additional custom nodes and models using universal downloader
-python3 /universal_downloader.py aua-sp
-
-pip3 cache purge
-
-# Fix some incorrect modules
-pip3 install numpy==1.26.4
-cd /ComfyUI
-pip3 install -r requirements.txt
 deactivate

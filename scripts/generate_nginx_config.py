@@ -18,20 +18,24 @@ def read_environment_configs(config_dir: str) -> dict:
         print(f"Config directory not found: {config_dir}")
         return environments
     
-    for config_file in config_path.glob("*.json"):
-        try:
-            with open(config_file, 'r', encoding='utf-8') as f:
-                config = json.load(f)
-                env_name = config.get('name')
-                env_port = config.get('port')
-                
-                if env_name and env_port:
-                    environments[env_name] = env_port
-                    print(f"Found environment: {env_name} -> port {env_port}")
-                else:
-                    print(f"Invalid config in {config_file}: missing name or port")
-        except Exception as e:
-            print(f"Error reading {config_file}: {e}")
+    # Look for config.json files in subdirectories
+    for env_dir in config_path.iterdir():
+        if env_dir.is_dir():
+            config_file = env_dir / "config.json"
+            if config_file.exists():
+                try:
+                    with open(config_file, 'r', encoding='utf-8') as f:
+                        config = json.load(f)
+                        env_name = config.get('name')
+                        env_port = config.get('port')
+                        
+                        if env_name and env_port:
+                            environments[env_name] = env_port
+                            print(f"Found environment: {env_name} -> port {env_port}")
+                        else:
+                            print(f"Invalid config in {config_file}: missing name or port")
+                except Exception as e:
+                    print(f"Error reading {config_file}: {e}")
     
     return environments
 

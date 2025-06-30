@@ -283,7 +283,7 @@ FastAPI 服务包含智能任务路由系统，根据工作流类型自动将任
 **注意**：`environment` 和 `target_port` 字段是系统根据 `workflow_name` 自动确定的。它们是输出字段，用于告知调用方应该使用哪个环境和端口来执行工作流。
 
 #### 工作流路由配置
-系统使用环境配置文件（`/config/environments/*.json`）将工作流映射到特定环境：
+系统使用环境配置文件（`/config/environments/{environment}/config.json`）将工作流映射到特定环境：
 - `clothes_prompt_changer_with_auto` → `aua-us` (端口 3002)
 - `clothes_prompt_changer_with_mask` → `aua-us` (端口 3002)
 - 其他工作流 → 根据配置分配
@@ -423,13 +423,37 @@ fi
 ```
 
 安装器执行以下步骤：
-1. **验证**：检查请求的环境是否有效（`comm` 或 `aua-sp`）
+1. **验证**：检查请求的环境是否有效（`comm`、`aua-us`、`aua-sp`）
 2. **构建脚本发现**：在 `/build/{environment}/` 中定位相应的构建脚本
 3. **模板复制**：将构建脚本复制到临时工作目录
 4. **路径替换**：将所有 `/ComfyUI` 引用替换为 `/workspace/ComfyUI-{environment}`
 5. **执行**：使用环境变量运行修改后的安装脚本
 6. **共享模型设置**：创建到共享模型目录的符号链接
-7. **验证**：确认安装成功完成
+7. **自定义节点安装**：下载并安装环境特定的自定义节点
+8. **依赖修复**：运行环境特定的依赖修复脚本（`fix_dependencies.sh`）
+9. **验证**：确认安装成功完成
+
+### 环境特定配置
+
+每个环境现在都有自己的配置目录结构：
+
+```
+/config/environments/
+├── comm/
+│   ├── config.json          # 环境配置（节点、模型、工作流）
+│   └── fix_dependencies.sh  # 环境特定的依赖修复
+├── aua-us/
+│   ├── config.json
+│   └── fix_dependencies.sh
+└── aua-sp/
+    ├── config.json
+    └── fix_dependencies.sh
+```
+
+这种模块化方法具有以下优点：
+- **环境特定依赖**：每个环境可以有不同的依赖要求
+- **隔离配置**：对一个环境的更改不会影响其他环境
+- **易于维护的更新**：可以轻松更新特定环境配置
 
 ## 💡 此架构的优势
 

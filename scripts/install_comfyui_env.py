@@ -339,6 +339,29 @@ class ComfyUIEnvironmentInstaller:
         if temp_dir.exists():
             shutil.rmtree(temp_dir)
             
+    def run_fix_dependencies(self) -> None:
+        """Run environment-specific dependency fix script"""
+        fix_script = Path(f"/config/environments/{self.environment}/fix_dependencies.sh")
+        
+        if not fix_script.exists():
+            logger.warning(f"No fix_dependencies.sh found for {self.environment}")
+            return
+            
+        logger.info(f"Running dependency fixes for {self.environment}...")
+        
+        try:
+            # Activate venv and run the fix script
+            cmd = f"cd {self.env_dir} && source venv/bin/activate && bash {fix_script}"
+            result = subprocess.run(cmd, shell=True, check=True, text=True, capture_output=True)
+            logger.info("Dependency fixes completed successfully")
+            if result.stdout:
+                logger.debug(f"Output: {result.stdout}")
+        except subprocess.CalledProcessError as e:
+            logger.error(f"Dependency fix failed: {e}")
+            if e.stderr:
+                logger.error(f"Error output: {e.stderr}")
+            raise
+            
     def install(self) -> None:
         """Main installation process"""
         # Validate environment
@@ -362,6 +385,9 @@ class ComfyUIEnvironmentInstaller:
                 logger.error(f"Universal downloader failed: {e}")
                 # Continue anyway, some downloads might have succeeded
             
+            # Run dependency fixes after universal downloader
+            self.run_fix_dependencies()
+            
             return
             
         # Check build scripts exist
@@ -380,6 +406,9 @@ class ComfyUIEnvironmentInstaller:
             
             # Download models
             self.download_models(temp_dir)
+            
+            # Run dependency fixes after installation
+            self.run_fix_dependencies()
             
             # Log completion
             logger.info(f"ComfyUI environment {self.environment} installation completed")

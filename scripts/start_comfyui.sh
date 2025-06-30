@@ -35,7 +35,7 @@ COMFYUI_DIR="/workspace/ComfyUI-${COMFYUI_ENVIRONMENT}"
 
 # Instance configuration
 # Read port from environment configuration file
-ENV_CONFIG="/config/environments/${COMFYUI_ENVIRONMENT}.json"
+ENV_CONFIG="/config/environments/${COMFYUI_ENVIRONMENT}/config.json"
 if [ -f "${ENV_CONFIG}" ]; then
     BASE_PORT=$(python3 -c "import json; print(json.load(open('${ENV_CONFIG}'))['port'])")
     echo "Using port ${BASE_PORT} from environment config: ${COMFYUI_ENVIRONMENT}"

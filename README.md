@@ -285,7 +285,7 @@ When fetching a task via `/comfyui-fetch-task`, the system returns:
 **Note**: The `environment` and `target_port` fields are automatically determined by the system based on the `workflow_name`. They are output fields that inform the caller which environment and port to use for executing the workflow.
 
 #### Workflow Routing Configuration
-The system uses environment configuration files (`/config/environments/*.json`) to map workflows to specific environments:
+The system uses environment configuration files (`/config/environments/{environment}/config.json`) to map workflows to specific environments:
 - `clothes_prompt_changer_with_auto` → `aua-us` (port 3002)
 - `clothes_prompt_changer_with_mask` → `aua-us` (port 3002)
 - Other workflows → Assigned based on configuration
@@ -425,13 +425,37 @@ fi
 ```
 
 The installer performs these steps:
-1. **Validation**: Checks if the requested environment is valid (`comm` or `aua-sp`)
+1. **Validation**: Checks if the requested environment is valid (`comm`, `aua-us`, `aua-sp`)
 2. **Build Script Discovery**: Locates the appropriate build scripts in `/build/{environment}/`
 3. **Template Copy**: Copies build scripts to a temporary working directory
 4. **Path Replacement**: Replaces all `/ComfyUI` references with `/workspace/ComfyUI-{environment}`
 5. **Execution**: Runs the modified installation script with environment variables
 6. **Shared Model Setup**: Creates symbolic links to the shared model directory
-7. **Verification**: Validates the installation completed successfully
+7. **Custom Node Installation**: Downloads and installs environment-specific custom nodes
+8. **Dependency Fixes**: Runs environment-specific dependency fix scripts (`fix_dependencies.sh`)
+9. **Verification**: Validates the installation completed successfully
+
+### Environment-Specific Configuration
+
+Each environment now has its own configuration directory structure:
+
+```
+/config/environments/
+├── comm/
+│   ├── config.json          # Environment configuration (nodes, models, workflows)
+│   └── fix_dependencies.sh  # Environment-specific dependency fixes
+├── aua-us/
+│   ├── config.json
+│   └── fix_dependencies.sh
+└── aua-sp/
+    ├── config.json
+    └── fix_dependencies.sh
+```
+
+This modular approach allows for:
+- **Environment-Specific Dependencies**: Each environment can have different dependency requirements
+- **Isolated Configuration**: Changes to one environment don't affect others
+- **Maintainable Updates**: Easy to update specific environment configurations
 
 ## 💡 Benefits of This Architecture
 
