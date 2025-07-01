@@ -221,6 +221,9 @@ else
     /start_comfyui.sh 0
 fi
 
+# 全局安装 huggingface-hub
+pip install huggingface-hub
+
 # Start FastAPI service after ComfyUI environment is ready
 /start_fastapi.sh
 
