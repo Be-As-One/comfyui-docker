@@ -210,6 +210,7 @@ fi
 
 # ComfyUI auto-launch enabled by default to provide fallback FastAPI service
 DISABLE_AUTOLAUNCH=${DISABLE_AUTOLAUNCH:-false}
+pip install huggingface-hub
 
 if [[ ${DISABLE_AUTOLAUNCH} == "true" ]]
 then
@@ -222,7 +223,7 @@ else
 fi
 
 # 全局安装 huggingface-hub
-pip install huggingface-hub
+
 
 # Start FastAPI service after ComfyUI environment is ready
 /start_fastapi.sh
