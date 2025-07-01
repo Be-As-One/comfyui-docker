@@ -224,6 +224,41 @@ class ComfyUIEnvironmentInstaller:
             logger.error(f"Failed to create symbolic link: {e}")
             raise
 
+    def create_input_symlink(self) -> None:
+        """Create symbolic link for input directory"""
+        logger.info(f"Creating input symlink for {self.env_dir}...")
+        
+        # Base ComfyUI directory
+        base_input_dir = Path("/workspace/ComfyUI/input")
+        
+        # Environment-specific directory
+        env_input_dir = self.env_dir / "input"
+        
+        # Create base directory if it doesn't exist
+        base_input_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Create symlink for input directory
+        if env_input_dir.exists():
+            if env_input_dir.is_symlink():
+                logger.info("Removing existing input symlink...")
+                env_input_dir.unlink()
+            elif env_input_dir.is_dir():
+                # Move existing files to base directory
+                logger.info("Moving existing input files to base directory...")
+                for file_path in env_input_dir.iterdir():
+                    target = base_input_dir / file_path.name
+                    if not target.exists():
+                        shutil.move(str(file_path), str(target))
+                shutil.rmtree(env_input_dir)
+        
+        # Create symbolic link
+        try:
+            env_input_dir.symlink_to(base_input_dir)
+            logger.info(f"Symbolic link created: {env_input_dir} -> {base_input_dir}")
+        except Exception as e:
+            logger.error(f"Failed to create input symbolic link: {e}")
+            raise
+
     def setup_shared_models(self) -> None:
         """Setup shared models for the environment"""
         logger.info(f"Setting up shared models for {self.environment}...")
@@ -401,6 +436,9 @@ class ComfyUIEnvironmentInstaller:
             logger.info("Environment exists, ensuring shared models and custom nodes are complete...")
             self.setup_shared_models()
             
+            # Create input symlink
+            self.create_input_symlink()
+            
             # Download custom nodes and models using universal downloader
             try:
                 import subprocess
@@ -432,6 +470,9 @@ class ComfyUIEnvironmentInstaller:
             # Setup shared models
             self.setup_shared_models()
             
+            # Create input symlink
+            self.create_input_symlink()
+            
             # Download models
             self.download_models(temp_dir)
             
@@ -442,6 +483,7 @@ class ComfyUIEnvironmentInstaller:
             logger.info(f"ComfyUI environment {self.environment} installation completed")
             logger.info(f"Environment directory: {self.env_dir}")
             logger.info(f"Models directory: {self.env_dir}/models -> {self.shared_models_dir}")
+            logger.info(f"Input directory: {self.env_dir}/input -> /workspace/ComfyUI/input")
             
             # Verify installation
             self.verify_installation()
