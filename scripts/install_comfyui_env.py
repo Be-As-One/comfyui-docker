@@ -42,11 +42,6 @@ class ComfyUIEnvironmentInstaller:
         self.build_dir = Path(f"/build/{environment}")
         self.shared_models_dir = Path("/workspace/shared-models")
         
-    def validate_environment(self) -> None:
-        """Validate the environment parameter"""
-        if self.environment not in self.VALID_ENVIRONMENTS:
-            logger.error(f"Invalid environment. Must be one of: {', '.join(self.VALID_ENVIRONMENTS)}")
-            sys.exit(1)
             
     def check_existing_installation(self) -> bool:
         """Check if environment is already installed"""
@@ -427,8 +422,6 @@ class ComfyUIEnvironmentInstaller:
             
     def install(self) -> None:
         """Main installation process"""
-        # Validate environment
-        self.validate_environment()
         
         # Check if already installed
         if self.check_existing_installation():
