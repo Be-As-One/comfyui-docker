@@ -2,10 +2,13 @@
     "name": "tts",
     "description": "Basic ComfyUI environment with minimal dependencies",
     "port": 3004,
-    "workflows": [],
+    "workflows": [
+        "weather_voice_tts"
+    ],
     "nodes": [
         "ltdrdata/ComfyUI-Manager",
-        "wildminder/ComfyUI-Chatterbox"
+        "wildminder/ComfyUI-Chatterbox",
+        "WaddingtonHoldings/ComfyUI-InstaSD"
     ],
     "models": []
 }
