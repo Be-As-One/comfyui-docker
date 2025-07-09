@@ -33,15 +33,12 @@ logger = logging.getLogger(__name__)
 class ComfyUIEnvironmentInstaller:
     """Manages the installation of ComfyUI environments"""
     
-    VALID_ENVIRONMENTS = ['comm', 'aua-us', 'aua-sp']
-    
     def __init__(self, environment: str, skip_models: bool = False):
         self.environment = environment
         self.skip_models = skip_models
         self.env_dir = Path(f"/workspace/ComfyUI-{environment}")
         self.build_dir = Path(f"/build/{environment}")
         self.shared_models_dir = Path("/workspace/shared-models")
-        
             
     def check_existing_installation(self) -> bool:
         """Check if environment is already installed"""

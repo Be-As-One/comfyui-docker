@@ -1,0 +1,9 @@
+{
+    "name": "facefusion",
+    "description": "Basic ComfyUI environment with minimal dependencies",
+    "port": 3005,
+    "workflows": [],
+    "nodes": [
+    ],
+    "models": []
+}

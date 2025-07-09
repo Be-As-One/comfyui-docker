@@ -1,0 +1,37 @@
+{
+    "name": "fusionx-image2video",
+    "description": "Basic ComfyUI environment with minimal dependencies",
+    "port": 3006,
+    "workflows": [],
+    "nodes": [],
+    "models": [
+        {
+            "url": " https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/Wan21_T2V_14B_lightx2v_cfg_step_distill_lora_rank32.safetensors",
+            "type": "loras"
+        },
+        {
+            "url": "https://storage.googleapis.com/model-file/lora/wan/I2V-tittydrop-e26-%E8%84%B1%E4%B8%8A%E5%8D%8A%E8%BA%AB.safetensors",
+            "type": "loras"
+        },
+        {
+            "url": " https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/Wan2_1-I2V-14B-480P_fp8_e4m3fn.safetensors",
+            "type": "unet"
+        },
+        {
+            "url": "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/Wan2_1_VAE_bf16.safetensors",
+            "type": "vae"
+        },
+        {
+            "url": "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/umt5-xxl-enc-fp8_e4m3fn.safetensors",
+            "type": "clip"
+        },
+        {
+            "url": "https://huggingface.co/Kuvshin/models-moved/resolve/main/CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors",
+            "type": "clip_vision"
+        },
+        {
+            "url": "https://huggingface.co/vrgamedevgirl84/Wan14BT2VFusioniX/resolve/main/Wan14Bi2vFusioniX_fp16.safetensors",
+            "type": "unet"
+        }
+    ]
+}
