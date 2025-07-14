@@ -1,9 +1,24 @@
 {
     "name": "facefusion",
-    "description": "Basic ComfyUI environment with minimal dependencies",
+    "description": "FaceFusion face swapping service environment",
     "port": 3005,
-    "workflows": [],
-    "nodes": [
+    "service_type": "facefusion",
+    "startup_script": "start_facefusion.sh",
+    "external_handler": "/Users/hzy/Code/zhuilai/video-faceswap/fastapi_handler.py",
+    "workflows": [
+        "face_swap"
     ],
-    "models": []
+    "nodes": [],
+    "models": [
+        "inswapper_128_fp16.onnx",
+        "simswap_256.pth"
+    ],
+    "python_environment": "micromamba",
+    "conda_env": "facefusion",
+    "requirements": [
+        "facefusion",
+        "fastapi",
+        "uvicorn",
+        "onnxruntime-gpu"
+    ]
 }

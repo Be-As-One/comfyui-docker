@@ -40,10 +40,13 @@ eval "$(micromamba shell hook --shell bash)"
 micromamba activate
 micromamba create --name facefusion python=3.12
 
-# Clone the git repo of FaceFusion and set version
-git clone https://github.com/facefusion/facefusion.git /facefusion
+# Clone the git repo of FaceFusion (Be-As-One fork) and set version
+git clone git@github.com:Be-As-One/facefusion.git /facefusion
 cd /facefusion
-git checkout ${FACEFUSION_VERSION}
+# Use latest commit if no specific version is set
+if [ -n "${FACEFUSION_VERSION}" ]; then
+    git checkout ${FACEFUSION_VERSION}
+fi
 
 # Install torch
 #eval "$(micromamba shell hook --shell bash)"
