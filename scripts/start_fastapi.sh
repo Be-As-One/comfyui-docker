@@ -40,3 +40,4 @@ else
     echo "FASTAPI: Virtual environment not found at ${COMFYUI_DIR}/venv"
     echo "FASTAPI: Skipping FastAPI startup"
 fi
+
