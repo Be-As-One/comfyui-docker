@@ -106,7 +106,7 @@ class UniversalDownloader:
         
         # 获取下载源配置
         source = "auto"
-        if model_config:
+        if model_config and isinstance(model_config, dict):
             source = model_config.get("source", "auto")
         
         try:

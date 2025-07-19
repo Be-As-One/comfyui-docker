@@ -51,11 +51,11 @@ if [[ $? -ne 0 ]]; then
     exit 1
 fi
 
-# Check if the external FastAPI handler exists
-EXTERNAL_FASTAPI_HANDLER="/Users/hzy/Code/zhuilai/video-faceswap/fastapi_handler.py"
-if [[ ! -f "${EXTERNAL_FASTAPI_HANDLER}" ]]; then
-    echo "FACEFUSION: ERROR - External FastAPI handler not found: ${EXTERNAL_FASTAPI_HANDLER}"
-    echo "FACEFUSION: Please ensure the video-faceswap repository is available at the expected location"
+# Check if the FastAPI handler exists in FaceFusion directory
+FASTAPI_HANDLER="/facefusion/fastapi_handler.py"
+if [[ ! -f "${FASTAPI_HANDLER}" ]]; then
+    echo "FACEFUSION: ERROR - FastAPI handler not found: ${FASTAPI_HANDLER}"
+    echo "FACEFUSION: Please ensure FaceFusion is properly installed with FastAPI handler"
     exit 1
 fi
 
@@ -66,7 +66,7 @@ if [[ ! -d "/facefusion" ]]; then
     exit 1
 fi
 
-echo "FACEFUSION: Using external FastAPI handler: ${EXTERNAL_FASTAPI_HANDLER}"
+echo "FACEFUSION: Using FastAPI handler: ${FASTAPI_HANDLER}"
 echo "FACEFUSION: Starting FaceFusion service on port ${FACEFUSION_PORT}"
 echo "FACEFUSION: Log file: ${LOG_FILE}"
 
@@ -78,11 +78,11 @@ micromamba activate facefusion
 export FACEFUSION_PORT=${FACEFUSION_PORT}
 export FACEFUSION_HOST="0.0.0.0"
 
-# Change to the video-faceswap directory to run the handler
-cd "$(dirname "${EXTERNAL_FASTAPI_HANDLER}")"
+# Change to the FaceFusion directory to run the handler
+cd "/facefusion"
 
 # Start FaceFusion FastAPI service
-CMD="python3 ${EXTERNAL_FASTAPI_HANDLER}"
+CMD="python3 ${FASTAPI_HANDLER}"
 echo "FACEFUSION: Executing: ${CMD}"
 
 # Start FaceFusion instance

@@ -4,15 +4,11 @@
     "port": 3005,
     "service_type": "facefusion",
     "startup_script": "start_facefusion.sh",
-    "external_handler": "/Users/hzy/Code/zhuilai/video-faceswap/fastapi_handler.py",
     "workflows": [
         "face_swap"
     ],
     "nodes": [],
-    "models": [
-        "inswapper_128_fp16.onnx",
-        "simswap_256.pth"
-    ],
+    "models": [],
     "python_environment": "micromamba",
     "conda_env": "facefusion",
     "requirements": [
