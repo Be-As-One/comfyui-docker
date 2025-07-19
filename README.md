@@ -13,6 +13,27 @@
 
 </div>
 
+## 📑 Table of Contents
+
+- [🚀 Key Features](#-key-features)
+- [🏗️ System Architecture](#️-system-architecture)
+- [📁 Directory Structure](#-directory-structure)
+- [💻 Installs](#-installs)
+- [🌐 Available on RunPod](#-available-on-runpod)
+- [🛠️ Building the Docker image](#️-building-the-docker-image)
+- [🚀 Running Locally](#-running-locally)
+- [🔌 Ports](#-ports)
+- [🎛️ Environment Variables](#️-environment-variables)
+- [🔌 External API Usage](#-external-api-usage)
+- [📊 Logs](#-logs)
+- [🧠 Smart Environment Management System](#-smart-environment-management-system)
+- [💡 Benefits of This Architecture](#-benefits-of-this-architecture)
+- [📋 Multi-Instance Configuration](#-multi-instance-configuration)
+- [🔧 External API Integration Examples](#-external-api-integration-examples)
+- [🤖 FaceFusion Integration](#-facefusion-integration)
+- [🐛 Troubleshooting](#-troubleshooting)
+- [🤝 Community and Contributing](#-community-and-contributing)
+
 ## 🚀 Key Features
 
 - **Multi-Instance Support**: Run multiple ComfyUI instances on a single machine with different configurations
@@ -368,9 +389,6 @@ docker exec your-container /stop_comfyui.sh all
 docker exec your-container /stop_comfyui.sh instance 0
 ```
 
-> For detailed API documentation and advanced usage examples, see:
-> - [scripts/EXTERNAL_API_EXAMPLE.md](scripts/EXTERNAL_API_EXAMPLE.md) - Complete API integration guide
-> - [scripts/MULTI_INSTANCE_USAGE.md](scripts/MULTI_INSTANCE_USAGE.md) - Multi-instance configuration guide
 
 ## 📊 Logs
 
@@ -382,6 +400,7 @@ ComfyUI creates separate log files for each instance:
 | ComfyUI Instance 1  | /workspace/logs/comfyui_instance_1.log |
 | ComfyUI Instance N  | /workspace/logs/comfyui_instance_N.log |
 | FastAPI             | /workspace/logs/fastapi.log            |
+| FaceFusion          | /workspace/logs/facefusion.log         |
 
 You can tail individual instance logs:
 ```bash
@@ -488,6 +507,695 @@ This modular approach allows for:
 - **Dynamic Configuration**: Each instance can have different startup parameters
 - **Easy Integration**: Simple API integration with orchestration systems
 - **Extensible Architecture**: Simple to add new workflow types and environments
+
+## 📋 Multi-Instance Configuration
+
+This system supports running multiple ComfyUI instances with flexible port assignment through configuration files. Perfect for GPU environments where you need multiple ComfyUI instances on different ports.
+
+### Configuration File
+
+The system uses `instances.json` configuration file located in the root directory (`/instances.json`). This file defines all instances with their specific settings.
+
+#### Configuration Format
+```json
+{
+  "instances": [
+    {
+      "id": 0,
+      "port": 3001,
+      "name": "comfyui-main",
+      "description": "Main ComfyUI instance",
+      "extra_args": "",
+      "enabled": true
+    },
+    {
+      "id": 1,
+      "port": 3005,
+      "name": "comfyui-backup",
+      "description": "Backup ComfyUI instance",
+      "extra_args": "",
+      "enabled": true
+    }
+  ],
+  "global_settings": {
+    "log_directory": "/workspace/logs",
+    "pid_directory": "/workspace/logs",
+    "default_extra_args": "",
+    "startup_delay": 2
+  }
+}
+```
+
+### Environment Variables (Legacy Support)
+- `COMFYUI_ENABLE_MULTI_INSTANCE`: Set to "true" to enable multi-instance mode
+- `COMFYUI_INSTANCES`: Number of instances (used for backward compatibility)
+
+### Usage Examples
+
+#### Basic Commands
+```bash
+# Start all enabled instances from configuration
+/start_comfyui_multi.sh start
+
+# Stop all instances
+/start_comfyui_multi.sh stop
+
+# Restart all instances
+/start_comfyui_multi.sh restart
+
+# Check status of all instances
+/start_comfyui_multi.sh status
+```
+
+#### Advanced Commands
+```bash
+# Start specific instance by name
+/start_comfyui_multi.sh start-by-name comfyui-main
+
+# Stop specific instance by name
+/start_comfyui_multi.sh stop-by-name comfyui-backup
+
+# Start instances in a port range
+/start_comfyui_multi.sh start-ports 3001-3005
+
+# Show help and available commands
+/start_comfyui_multi.sh help
+```
+
+#### Docker Integration
+```bash
+# Enable multi-instance mode with configuration file
+docker run -e COMFYUI_ENABLE_MULTI_INSTANCE=true your-image
+
+# Mount custom configuration
+docker run -v /path/to/instances.json:/instances.json your-image
+```
+
+### Features
+
+#### Flexible Port Assignment
+Unlike traditional sequential port assignment, you can now assign any port to any instance:
+```json
+{
+  "instances": [
+    {"id": 0, "port": 3001, "name": "main"},
+    {"id": 1, "port": 8080, "name": "web"},
+    {"id": 2, "port": 9000, "name": "test"}
+  ]
+}
+```
+
+#### Instance Management
+- **Named instances**: Each instance has a human-readable name
+- **Enable/Disable**: Control which instances start automatically
+- **Individual configuration**: Each instance can have different startup arguments
+- **GPU-ready**: Designed for GPU environments with simple configuration
+
+#### Log and PID Files
+- **Log files**: `/workspace/logs/comfyui_instance_<id>.log`
+- **PID files**: `/workspace/logs/comfyui_instance_<id>.pid`
+
+#### Configuration Properties
+- `id`: Unique identifier for the instance
+- `port`: Port number for the instance
+- `name`: Human-readable name
+- `description`: Optional description
+- `extra_args`: Additional ComfyUI arguments (e.g., "--lowvram")
+- `enabled`: Whether this instance should start automatically
+
+### Migrating from Environment Variables
+If you were using the old environment variable approach:
+```bash
+# Old way
+COMFYUI_INSTANCES=3 COMFYUI_BASE_PORT=3001
+
+# New way - edit instances.json
+{
+  "instances": [
+    {"id": 0, "port": 3001, "name": "instance-0", "enabled": true},
+    {"id": 1, "port": 3002, "name": "instance-1", "enabled": true},  
+    {"id": 2, "port": 3003, "name": "instance-2", "enabled": true}
+  ]
+}
+```
+
+## 🔧 External API Integration Examples
+
+### Overview
+This section provides comprehensive examples for integrating with the ComfyUI multi-instance system via external API calls.
+
+### Container Setup
+The ComfyUI container now starts with **no ComfyUI instances running by default**. Only the FastAPI service runs on port 8001. ComfyUI instances are started on-demand via external API calls.
+
+### Python FastAPI Example
+
+```python
+import subprocess
+import json
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from typing import List, Optional
+
+app = FastAPI()
+
+# Configuration
+CONTAINER_NAME = "your-comfyui-container"
+DOCKER_EXEC_CMD = f"docker exec {CONTAINER_NAME}"
+
+class ComfyUIInstance(BaseModel):
+    id: int
+    port: int
+    name: str
+    extra_args: Optional[str] = ""
+    enabled: Optional[bool] = True
+
+class StartInstancesRequest(BaseModel):
+    environment: Optional[str] = "comm"  # Environment type: comm or aua-sp
+    instances: List[ComfyUIInstance]
+
+@app.post("/api/comfyui/start-instances")
+async def start_comfyui_instances(request: StartInstancesRequest):
+    """Start ComfyUI instances using direct environment variable approach"""
+    
+    results = []
+    
+    for instance in request.instances:
+        if not instance.enabled:
+            continue
+            
+        # Set environment variables and execute
+        env_vars = f'COMFYUI_ENVIRONMENT={request.environment} INSTANCE_PORT={instance.port} INSTANCE_NAME={instance.name}'
+        cmd = f'{DOCKER_EXEC_CMD} bash -c "{env_vars} /start_comfyui.sh {instance.id} \'{instance.extra_args}\'"'
+    
+        try:
+            result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=60)
+            
+            if result.returncode == 0:
+                results.append({
+                    "instance_id": instance.id,
+                    "name": instance.name,
+                    "port": instance.port,
+                    "status": "started",
+                    "output": result.stdout
+                })
+            else:
+                results.append({
+                    "instance_id": instance.id,
+                    "name": instance.name,
+                    "port": instance.port,
+                    "status": "failed",
+                    "error": result.stderr
+                })
+                
+        except subprocess.TimeoutExpired:
+            results.append({
+                "instance_id": instance.id,
+                "name": instance.name,
+                "port": instance.port,
+                "status": "timeout"
+            })
+        except Exception as e:
+            results.append({
+                "instance_id": instance.id,
+                "name": instance.name,
+                "port": instance.port,
+                "status": "error",
+                "error": str(e)
+            })
+    
+    return {
+        "status": "completed",
+        "environment": request.environment,
+        "results": results,
+        "total_instances": len(request.instances),
+        "started_instances": len([r for r in results if r["status"] == "started"])
+    }
+
+@app.post("/api/comfyui/stop-all")
+async def stop_all_instances():
+    """Stop all running ComfyUI instances"""
+    
+    cmd = f'{DOCKER_EXEC_CMD} /stop_comfyui.sh all'
+    
+    try:
+        result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=30)
+        return {
+            "status": "success",
+            "message": "All instances stopped",
+            "output": result.stdout
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/comfyui/status")
+async def get_instances_status():
+    """Get status of all ComfyUI instances"""
+    
+    cmd = f'{DOCKER_EXEC_CMD} /stop_comfyui.sh status'
+    
+    try:
+        result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=15)
+        return {
+            "status": "success",
+            "output": result.stdout
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/comfyui/start-single")
+async def start_single_instance(instance: ComfyUIInstance, environment: str = "comm"):
+    """Start a single ComfyUI instance"""
+    
+    # Set environment variables and execute
+    env_vars = f'COMFYUI_ENVIRONMENT={environment} INSTANCE_PORT={instance.port} INSTANCE_NAME={instance.name}'
+    cmd = f'{DOCKER_EXEC_CMD} bash -c "{env_vars} /start_comfyui.sh {instance.id} \'{instance.extra_args}\'"'
+    
+    try:
+        result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=30)
+        
+        if result.returncode == 0:
+            return {
+                "status": "success",
+                "message": f"Instance '{instance.name}' started on port {instance.port}",
+                "output": result.stdout
+            }
+        else:
+            raise HTTPException(
+                status_code=500, 
+                detail=f"Failed to start instance: {result.stderr}"
+            )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+```
+
+### Usage Examples
+
+#### 1. Start Multiple Instances
+```bash
+curl -X POST "http://your-api-host/api/comfyui/start-instances" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "environment": "comm",
+    "instances": [
+      {
+        "id": 0,
+        "port": 3001,
+        "name": "comfyui-main",
+        "extra_args": "",
+        "enabled": true
+      },
+      {
+        "id": 1,
+        "port": 3005,
+        "name": "comfyui-backup",
+        "extra_args": "--lowvram",
+        "enabled": true
+      }
+    ]
+  }'
+```
+
+#### 2. Start Single Instance
+```bash
+curl -X POST "http://your-api-host/api/comfyui/start-single" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "id": 0,
+    "port": 3001,
+    "name": "comfyui-quick",
+    "extra_args": "",
+    "enabled": true
+  }'
+```
+
+#### 3. Check Status
+```bash
+curl -X GET "http://your-api-host/api/comfyui/status"
+```
+
+#### 4. Stop All Instances
+```bash
+curl -X POST "http://your-api-host/api/comfyui/stop-all"
+```
+
+### Direct Container Commands
+
+You can also interact directly with the container:
+
+```bash
+# Start single instance with environment variables
+docker exec your-container bash -c \
+  'COMFYUI_ENVIRONMENT=comm INSTANCE_PORT=3001 INSTANCE_NAME=main /start_comfyui.sh 0'
+
+# Start multiple instances
+docker exec your-container bash -c \
+  'COMFYUI_ENVIRONMENT=comm INSTANCE_PORT=3001 INSTANCE_NAME=main /start_comfyui.sh 0'
+docker exec your-container bash -c \
+  'COMFYUI_ENVIRONMENT=aua-sp INSTANCE_PORT=3002 INSTANCE_NAME=backup /start_comfyui.sh 1'
+
+# Check status
+docker exec your-container /stop_comfyui.sh status
+
+# Stop all instances
+docker exec your-container /stop_comfyui.sh all
+
+# Stop specific instance
+docker exec your-container /stop_comfyui.sh instance 0
+```
+
+### Node.js Express Example
+
+```javascript
+const express = require('express');
+const { exec } = require('child_process');
+const app = express();
+
+app.use(express.json());
+
+const CONTAINER_NAME = 'your-comfyui-container';
+
+app.post('/api/comfyui/start-instances', (req, res) => {
+    const { instances } = req.body;
+    
+    if (!instances || !Array.isArray(instances)) {
+        return res.status(400).json({ error: 'Invalid instances array' });
+    }
+    
+    const jsonConfig = JSON.stringify({ instances });
+    const cmd = `docker exec ${CONTAINER_NAME} /start_comfyui_multi.sh json '${jsonConfig}'`;
+    
+    exec(cmd, { timeout: 60000 }, (error, stdout, stderr) => {
+        if (error) {
+            return res.status(500).json({ error: error.message, stderr });
+        }
+        
+        res.json({
+            status: 'success',
+            message: 'Instances started',
+            output: stdout,
+            instances_count: instances.length
+        });
+    });
+});
+
+app.listen(3000, () => {
+    console.log('ComfyUI API server running on port 3000');
+});
+```
+
+### Configuration Notes
+
+#### JSON Configuration Format
+```json
+{
+  "environment": "comm",     // Environment type: "comm" or "aua-sp"
+  "instances": [
+    {
+      "id": 0,               // Unique instance ID
+      "port": 3001,          // Port for this instance
+      "name": "main",        // Human-readable name
+      "extra_args": "",      // Additional ComfyUI arguments
+      "enabled": true        // Whether to start this instance
+    }
+  ]
+}
+```
+
+#### Environment Variables
+- `DISABLE_AUTOLAUNCH=true` (default) - ComfyUI won't start automatically
+- `DISABLE_AUTOLAUNCH=false` - Enable automatic startup using instances.json
+
+#### Port Management
+- ComfyUI instances: 3001+ (configurable)
+- FastAPI service: 8001 (always running)
+- Choose ports that don't conflict with other services
+
+#### Environment Types
+- **comm**: Standard ComfyUI environment with common models and nodes
+- **aua-sp**: Specialized environment with additional features and models
+
+#### Shared Models Architecture
+The system uses a shared model storage to optimize disk space and startup time:
+
+```
+/workspace/
+├── shared-models/              # Shared model storage (soft-linked)
+│   ├── checkpoints/
+│   ├── loras/
+│   ├── controlnet/
+│   └── vae/
+│
+├── ComfyUI-comm/               # comm environment
+│   ├── models/                 # symlink -> /workspace/shared-models/
+│   ├── custom_nodes/           # environment-specific nodes
+│   └── venv/                   # environment-specific Python env
+│
+└── ComfyUI-aua-sp/             # aua-sp environment
+    ├── models/                 # symlink -> /workspace/shared-models/
+    ├── custom_nodes/           # environment-specific nodes
+    └── venv/                   # environment-specific Python env
+```
+
+**Benefits**:
+- Models are stored only once, saving GB of disk space
+- Fast environment switching without re-downloading models
+- Each environment has isolated custom nodes and dependencies
+
+### Benefits of This Approach
+
+1. **Resource Efficiency**: No ComfyUI instances running until needed
+2. **Dynamic Configuration**: Each startup can use different settings
+3. **External Control**: Complete management via API calls
+4. **Scalability**: Easy to integrate with orchestration systems
+5. **Flexibility**: Support both file-based and API-driven configuration
+6. **Space Optimization**: Shared model storage reduces disk usage
+7. **Multi-Environment**: Support different ComfyUI configurations simultaneously
+
+## 🤖 FaceFusion Integration
+
+This section describes the FaceFusion face swap integration for the ComfyUI Docker setup.
+
+### Overview
+
+The FaceFusion integration allows running face swap services using the Be-As-One fork of FaceFusion within the ComfyUI Docker environment. The integration includes:
+
+- Custom installation script for the Be-As-One FaceFusion fork
+- Dedicated startup script for FaceFusion service
+- Integration with external FastAPI handler
+- Docker build targets for FaceFusion workflows
+
+### Key Components
+
+#### 1. Installation Script
+**Location:** `build/facefusion/install_comfyui.sh`
+- Installs FaceFusion from `git@github.com:Be-As-One/facefusion.git`
+- Sets up micromamba environment with Python 3.12
+- Installs PyTorch and FaceFusion dependencies
+
+#### 2. Startup Script
+**Location:** `scripts/start_facefusion.sh`
+- Manages FaceFusion service lifecycle
+- Integrates with external FastAPI handler at `/Users/hzy/Code/zhuilai/video-faceswap/fastapi_handler.py`
+- Handles environment activation and logging
+
+#### 3. Environment Configuration
+**Location:** `config/environments/facefusion/config.json`
+- Service runs on port 3005
+- Configured for face swap workflows
+- Specifies external FastAPI handler integration
+
+#### 4. Docker Build Configuration
+**Location:** `docker-bake.hcl`
+- Added `facefusion` group with CUDA 12.4 and 12.8 targets
+- Includes FaceFusion-specific build arguments
+- Supports both `facefusion-cu124-py312` and `facefusion-cu128-py312` targets
+
+### Usage
+
+#### Building FaceFusion Docker Image
+
+```bash
+# Build FaceFusion images for all CUDA versions
+docker buildx bake facefusion
+
+# Build specific CUDA version
+docker buildx bake facefusion-cu128-py312
+```
+
+#### Running FaceFusion Container
+
+```bash
+# Run with external FastAPI handler mounted
+docker run -d \
+  --name comfyui-facefusion \
+  --gpus all \
+  -p 3005:3005 \
+  -v /Users/hzy/Code/zhuilai/video-faceswap:/external/video-faceswap \
+  your-registry/comfyui:facefusion-cu128-py312-latest
+
+# Start FaceFusion service inside container
+docker exec comfyui-facefusion /start_facefusion.sh
+```
+
+#### Service Management
+
+```bash
+# Check FaceFusion service status
+docker exec comfyui-facefusion /start_facefusion.sh status
+
+# View service logs
+docker exec comfyui-facefusion tail -f /workspace/logs/facefusion.log
+
+# Stop service (if needed)
+docker exec comfyui-facefusion pkill -f fastapi_handler.py
+```
+
+### Requirements
+
+#### External Dependencies
+- **FaceFusion FastAPI Handler**: `/Users/hzy/Code/zhuilai/video-faceswap/fastapi_handler.py`
+- **Video FaceSwap Repository**: Must be available at runtime for volume mounting
+
+#### System Requirements
+- NVIDIA GPU with CUDA support
+- Docker with BuildKit support
+- Sufficient disk space for FaceFusion models
+
+### API Endpoints
+
+Once running, FaceFusion service exposes API endpoints on port 3005:
+
+```bash
+# Health check
+curl http://localhost:3005/health
+
+# Face swap processing
+curl -X POST http://localhost:3005/process \
+  -H "Content-Type: application/json" \
+  -d '{
+    "source_url": "https://example.com/source.jpg",
+    "target_url": "https://example.com/target.jpg",
+    "resolution": "1024x1024",
+    "model": "inswapper_128_fp16"
+  }'
+```
+
+### Integration Testing
+
+Run the integration test to verify setup:
+
+```bash
+cd /path/to/comfyui-docker
+./scripts/test_facefusion_integration.sh
+```
+
+### Architecture Notes
+
+- FaceFusion runs in isolated micromamba environment (`facefusion`)
+- External FastAPI handler provides REST API interface
+- Service integrates with existing ComfyUI Docker infrastructure
+- Shared model storage architecture reduces disk usage
+- Environment configuration allows for future workflow extensions
+
+### Version Information
+
+- **FaceFusion Version**: 3.0.0 (configurable via `FACEFUSION_VERSION` build arg)
+- **Python Version**: 3.12
+- **CUDA Support**: 12.4 and 12.8
+- **PyTorch Version**: 2.6.0+ (CUDA 12.4) / 2.7.0+ (CUDA 12.8)
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+#### Docker Build Issues
+
+**Problem**: "failed to find target cu124-py312" error
+- **Solution**: Ensure you're using the latest `docker-bake.hcl` file. All build targets have been unified and the `-comm` suffix removed.
+- **Test**: Run `docker buildx bake --print cu124-py312` to verify the target exists.
+
+#### Multi-Instance Issues
+
+**Problem**: Instances fail to start
+- Check if ports are already in use: `netstat -tlnp | grep 300`
+- Verify instances.json configuration: `cat /instances.json`
+- Check instance logs: `tail -f /workspace/logs/comfyui_instance_0.log`
+
+**Problem**: Environment not found error
+- The environment will be automatically installed on first use
+- Check installation logs: `tail -f /workspace/logs/install_comfyui_env.log`
+- Verify environment exists: `ls -la /workspace/ComfyUI-*`
+
+#### FaceFusion Issues
+
+**Problem**: External FastAPI Handler Not Found
+- Ensure `/Users/hzy/Code/zhuilai/video-faceswap/fastapi_handler.py` exists
+- Check volume mount in Docker run command
+
+**Problem**: FaceFusion Installation Fails
+- Verify SSH access to GitHub for `git@github.com:Be-As-One/facefusion.git`
+- Check build logs for dependency issues
+
+**Problem**: Service Won't Start
+- Check micromamba environment activation
+- Verify Python dependencies are installed
+- Review logs at `/workspace/logs/facefusion.log`
+
+### Debug Commands
+
+```bash
+# Check running instances
+docker exec your-container ps aux | grep comfyui
+
+# Check port usage
+docker exec your-container netstat -tlnp
+
+# Check disk space
+docker exec your-container df -h
+
+# Check GPU availability
+docker exec your-container nvidia-smi
+
+# Check Python environments
+docker exec your-container ls -la /workspace/ComfyUI-*/venv/
+
+# Check micromamba environments (for FaceFusion)
+docker exec comfyui-facefusion micromamba env list
+
+# Test FaceFusion installation
+docker exec comfyui-facefusion ls -la /facefusion
+
+# Check Python environment
+docker exec comfyui-facefusion micromamba activate facefusion && python -c "import facefusion; print('OK')"
+```
+
+### Performance Optimization
+
+1. **GPU Memory Issues**
+   - Use `--lowvram` flag in instance extra_args
+   - Reduce batch size in workflows
+   - Monitor with `nvidia-smi`
+
+2. **Disk Space Management**
+   - Shared models save significant space
+   - Clean unused environments: `rm -rf /workspace/ComfyUI-unused`
+   - Clear cache: `rm -rf /workspace/.cache/*`
+
+3. **Network Performance**
+   - Use local model storage when possible
+   - Configure proper DNS in container
+   - Check firewall rules for API access
+
+### Getting Help
+
+1. Check the logs first - they usually contain helpful error messages
+2. Verify your configuration matches the examples
+3. Try with minimal configuration first, then add complexity
+4. Report issues on [GitHub](https://github.com/ashleykleynhans/comfyui-docker) with:
+   - Docker version
+   - GPU model and driver version
+   - Full error logs
+   - Configuration files used
 
 ## 🤝 Community and Contributing
 
