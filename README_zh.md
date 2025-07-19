@@ -65,7 +65,7 @@ graph TB
     
     subgraph "运行时 - 实例创建"
         C1["API 请求创建实例"] --> C2{"目标环境是否存在?"}
-        C2 -->|否| C3["install_comfyui_env.py: 复制并修改构建脚本"]
+        C2 -->|否| C3["install_env.py: 复制并修改构建脚本"]
         C3 --> C4["将 /ComfyUI 替换为 /workspace/ComfyUI-env"]
         C4 --> C5["执行修改后的安装脚本"]
         C5 --> C6["设置共享模型链接"]
@@ -106,7 +106,7 @@ sequenceDiagram
     participant Client as 外部客户端
     participant API as FastAPI 服务
     participant StartScript as start_comfyui.sh
-    participant Installer as install_comfyui_env.py
+    participant Installer as install_env.py
     participant BuildScripts as /build/{env}/
     participant ComfyUI as ComfyUI 实例
     
@@ -115,10 +115,10 @@ sequenceDiagram
     StartScript->>StartScript: 检查 /workspace/ComfyUI-{env} 是否存在
     
     alt 环境未找到
-        StartScript->>Installer: 调用 install_comfyui_env.py {env}
+        StartScript->>Installer: 调用 install_env.py {env}
         Installer->>BuildScripts: 复制构建脚本到临时目录
         Installer->>Installer: 将 /ComfyUI 替换为 /workspace/ComfyUI-{env}
-        Installer->>Installer: 执行修改后的 install_comfyui.sh
+        Installer->>Installer: 执行修改后的 install.sh
         Installer->>Installer: 设置共享模型符号链接
         Installer->>StartScript: 安装完成
     end
@@ -869,7 +869,7 @@ FaceFusion 集成允许在 ComfyUI Docker 环境中使用 Be-As-One 的 FaceFusi
 ### 关键组件
 
 #### 1. 安装脚本
-**位置：** `build/facefusion/install_comfyui.sh`
+**位置：** `build/facefusion/install.sh`
 - 从 `git@github.com:Be-As-One/facefusion.git` 安装 FaceFusion
 - 使用 Python 3.12 设置 micromamba 环境
 - 安装 PyTorch 和 FaceFusion 依赖项
@@ -1011,7 +1011,7 @@ tail -f /workspace/logs/comfyui_instance_0.log
 系统使用先进的构建脚本复制机制：
 
 1. **模板准备**：为每种工作流类型（`comm`、`aua-sp`）在 `/build/{workflow}/` 准备构建脚本
-2. **动态复制和修改**：需要新环境时，`install_comfyui_env.py` 将构建脚本复制到临时目录
+2. **动态复制和修改**：需要新环境时，`install_env.py` 将构建脚本复制到临时目录
 3. **路径转换**：脚本中的所有路径动态替换，从 `/ComfyUI` 改为 `/workspace/ComfyUI-{environment}`
 4. **隔离执行**：修改后的脚本在隔离环境中运行，创建环境特定的安装
 
@@ -1020,8 +1020,8 @@ tail -f /workspace/logs/comfyui_instance_0.log
 ```mermaid
 graph LR
     A[docker buildx bake] --> B{ARG WORKFLOW}
-    B -->|comm| C[build/comm/install_comfyui.sh]
-    B -->|aua-sp| D[build/aua-sp/install_comfyui.sh]
+    B -->|comm| C[build/comm/install.sh]
+    B -->|aua-sp| D[build/aua-sp/install.sh]
     C --> E[ComfyUI 镜像: comm 变体]
     D --> F[ComfyUI 镜像: aua-sp 变体]
 ```
@@ -1034,7 +1034,7 @@ graph LR
 # start_comfyui.sh 中的环境检查
 if [[ ! -d "${COMFYUI_DIR}" || ! -f "${COMFYUI_DIR}/main.py" ]]; then
     echo "COMFYUI: Environment ${COMFYUI_ENVIRONMENT} not found. Installing..."
-    /install_comfyui_env.py "${COMFYUI_ENVIRONMENT}"
+    /install_env.py "${COMFYUI_ENVIRONMENT}"
 fi
 ```
 

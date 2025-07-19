@@ -56,7 +56,7 @@ mkdir -p "/workspace/logs"
 
 # Ensure environment is complete and up-to-date
 echo "COMFYUI: Ensuring environment ${COMFYUI_ENVIRONMENT} is complete..."
-/install_comfyui_env.py "${COMFYUI_ENVIRONMENT}"
+/install_env.py "${COMFYUI_ENVIRONMENT}"
 
 if [[ $? -ne 0 ]]; then
     echo "COMFYUI: ERROR - Failed to install environment ${COMFYUI_ENVIRONMENT}"

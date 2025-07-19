@@ -14,7 +14,7 @@ The FaceFusion integration allows running face swap services using the Be-As-One
 ## Key Components
 
 ### 1. Installation Script
-**Location:** `build/facefusion/install_comfyui.sh`
+**Location:** `build/facefusion/install.sh`
 - Installs FaceFusion from `git@github.com:Be-As-One/facefusion.git`
 - Sets up micromamba environment with Python 3.12
 - Installs PyTorch and FaceFusion dependencies

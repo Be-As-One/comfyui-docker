@@ -65,7 +65,7 @@ graph TB
     
     subgraph "Runtime - Instance Creation"
         C1["API Request to Create Instance"] --> C2{"Target Environment Exists?"}
-        C2 -->|No| C3["install_comfyui_env.py: Copy & Modify Build Scripts"]
+        C2 -->|No| C3["install_env.py: Copy & Modify Build Scripts"]
         C3 --> C4["Replace /ComfyUI with /workspace/ComfyUI-env"]
         C4 --> C5["Execute Modified Installation Script"]
         C5 --> C6["Setup Shared Model Links"]
@@ -106,7 +106,7 @@ sequenceDiagram
     participant Client as External Client
     participant API as FastAPI Service
     participant StartScript as start_comfyui.sh
-    participant Installer as install_comfyui_env.py
+    participant Installer as install_env.py
     participant BuildScripts as /build/{env}/
     participant ComfyUI as ComfyUI Instance
     
@@ -115,10 +115,10 @@ sequenceDiagram
     StartScript->>StartScript: Check if /workspace/ComfyUI-{env} exists
     
     alt Environment Not Found
-        StartScript->>Installer: Call install_comfyui_env.py {env}
+        StartScript->>Installer: Call install_env.py {env}
         Installer->>BuildScripts: Copy build scripts to temp directory
         Installer->>Installer: Replace /ComfyUI with /workspace/ComfyUI-{env}
-        Installer->>Installer: Execute modified install_comfyui.sh
+        Installer->>Installer: Execute modified install.sh
         Installer->>Installer: Setup shared models symlinks
         Installer->>StartScript: Installation complete
     end
@@ -416,7 +416,7 @@ This project features an innovative environment management system that combines 
 The system uses a sophisticated build script replication mechanism:
 
 1. **Template Preparation**: Build scripts are prepared for each workflow type (`comm`, `aua-sp`) in `/build/{workflow}/`
-2. **Dynamic Copy & Modify**: When a new environment is needed, `install_comfyui_env.py` copies the build scripts to a temporary directory
+2. **Dynamic Copy & Modify**: When a new environment is needed, `install_env.py` copies the build scripts to a temporary directory
 3. **Path Transformation**: All paths in the scripts are dynamically replaced from `/ComfyUI` to `/workspace/ComfyUI-{environment}`
 4. **Isolated Execution**: Modified scripts run in isolation, creating environment-specific installations
 
@@ -425,8 +425,8 @@ The system uses a sophisticated build script replication mechanism:
 ```mermaid
 graph LR
     A[docker buildx bake] --> B{ARG WORKFLOW}
-    B -->|comm| C[build/comm/install_comfyui.sh]
-    B -->|aua-sp| D[build/aua-sp/install_comfyui.sh]
+    B -->|comm| C[build/comm/install.sh]
+    B -->|aua-sp| D[build/aua-sp/install.sh]
     C --> E[ComfyUI Image: comm variant]
     D --> F[ComfyUI Image: aua-sp variant]
 ```
@@ -439,7 +439,7 @@ When `start_comfyui.sh` detects a missing environment:
 # Environment check in start_comfyui.sh
 if [[ ! -d "${COMFYUI_DIR}" || ! -f "${COMFYUI_DIR}/main.py" ]]; then
     echo "COMFYUI: Environment ${COMFYUI_ENVIRONMENT} not found. Installing..."
-    /install_comfyui_env.py "${COMFYUI_ENVIRONMENT}"
+    /install_env.py "${COMFYUI_ENVIRONMENT}"
 fi
 ```
 
@@ -987,7 +987,7 @@ The FaceFusion integration allows running face swap services using the Be-As-One
 ### Key Components
 
 #### 1. Installation Script
-**Location:** `build/facefusion/install_comfyui.sh`
+**Location:** `build/facefusion/install.sh`
 - Installs FaceFusion from `git@github.com:Be-As-One/facefusion.git`
 - Sets up micromamba environment with Python 3.12
 - Installs PyTorch and FaceFusion dependencies
@@ -1123,7 +1123,7 @@ cd /path/to/comfyui-docker
 
 **Problem**: Environment not found error
 - The environment will be automatically installed on first use
-- Check installation logs: `tail -f /workspace/logs/install_comfyui_env.log`
+- Check installation logs: `tail -f /workspace/logs/install_env.log`
 - Verify environment exists: `ls -la /workspace/ComfyUI-*`
 
 #### FaceFusion Issues

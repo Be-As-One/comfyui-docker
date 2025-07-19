@@ -22,8 +22,7 @@ if [[ "$1" == "status" ]]; then
 fi
 
 # Environment configuration
-FACEFUSION_ENVIRONMENT="facefusion"
-FACEFUSION_DIR="/workspace/ComfyUI-${FACEFUSION_ENVIRONMENT}"
+FACEFUSION_ENVIRONMENT="${FACEFUSION_ENVIRONMENT:-facefusion}"
 
 # Instance configuration
 ENV_CONFIG="/config/environments/${FACEFUSION_ENVIRONMENT}/config.json"
@@ -42,27 +41,27 @@ LOG_FILE="/workspace/logs/facefusion.log"
 # Ensure logs directory exists
 mkdir -p "/workspace/logs"
 
-# Ensure FaceFusion environment is complete and up-to-date
-echo "FACEFUSION: Ensuring environment ${FACEFUSION_ENVIRONMENT} is complete..."
-/install_comfyui_env.py "${FACEFUSION_ENVIRONMENT}"
-
-if [[ $? -ne 0 ]]; then
-    echo "FACEFUSION: ERROR - Failed to install environment ${FACEFUSION_ENVIRONMENT}"
+# Check if FaceFusion is properly installed
+if [[ ! -d "/facefusion" ]]; then
+    echo "FACEFUSION: ERROR - FaceFusion not found at /facefusion"
+    echo "FACEFUSION: Please ensure FaceFusion is properly installed during Docker build"
     exit 1
 fi
+
+# Check if micromamba environment exists
+if ! micromamba env list | grep -q "^facefusion "; then
+    echo "FACEFUSION: ERROR - Micromamba environment 'facefusion' not found"
+    echo "FACEFUSION: Please ensure the FaceFusion environment is created during Docker build"
+    exit 1
+fi
+
+echo "FACEFUSION: FaceFusion installation verified"
 
 # Check if the FastAPI handler exists in FaceFusion directory
 FASTAPI_HANDLER="/facefusion/fastapi_handler.py"
 if [[ ! -f "${FASTAPI_HANDLER}" ]]; then
     echo "FACEFUSION: ERROR - FastAPI handler not found: ${FASTAPI_HANDLER}"
     echo "FACEFUSION: Please ensure FaceFusion is properly installed with FastAPI handler"
-    exit 1
-fi
-
-# Check if FaceFusion is installed
-if [[ ! -d "/facefusion" ]]; then
-    echo "FACEFUSION: ERROR - FaceFusion not found at /facefusion"
-    echo "FACEFUSION: Please ensure FaceFusion is properly installed during Docker build"
     exit 1
 fi
 

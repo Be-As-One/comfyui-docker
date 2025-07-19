@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Environment-specific ComfyUI installer with integrated shared models management
-Usage: install_comfyui_env.py <environment> [skip_models|status]
+Environment-specific installer with integrated shared models management
+Usage: install_env.py <environment> [skip_models|status]
 Examples: 
-  install_comfyui_env.py comm
-  install_comfyui_env.py comm skip_models
-  install_comfyui_env.py comm status
+  install_env.py comm
+  install_env.py comm skip_models
+  install_env.py comm status
   
 Features:
 - Automatic environment-specific installation
@@ -55,9 +55,9 @@ class ComfyUIEnvironmentInstaller:
             logger.error(f"Expected directory: {self.build_dir}")
             sys.exit(1)
             
-        install_script = self.build_dir / "install_comfyui.sh"
+        install_script = self.build_dir / "install.sh"
         if not install_script.exists():
-            logger.error(f"install_comfyui.sh not found in {self.build_dir}")
+            logger.error(f"install.sh not found in {self.build_dir}")
             sys.exit(1)
             
     def prepare_install_script(self) -> Path:
@@ -71,7 +71,7 @@ class ComfyUIEnvironmentInstaller:
         shutil.copytree(self.build_dir, temp_dir)
         
         # Modify the install script
-        install_script = temp_dir / "install_comfyui.sh"
+        install_script = temp_dir / "install.sh"
         logger.info("Modifying install script for environment-specific installation...")
         
         with open(install_script, 'r') as f:
@@ -117,7 +117,7 @@ class ComfyUIEnvironmentInstaller:
         logger.info(f"XFORMERS_VERSION={env['XFORMERS_VERSION']}")
         logger.info(f"INDEX_URL={env['INDEX_URL']}")
         
-        install_script = temp_dir / "install_comfyui.sh"
+        install_script = temp_dir / "install.sh"
         
         try:
             # Run installation with real-time output

@@ -21,7 +21,7 @@ ARG XFORMERS_VERSION
 ARG INDEX_URL
 ARG COMFYUI_COMMIT
 # RUN mv ./requirements.txt ./ComfyUI/requirements.txt
-RUN /install_comfyui.sh
+RUN /install.sh
 
 # Install FastAPI (shared across all environments)
 RUN /install_fastapi.sh
@@ -32,7 +32,7 @@ ARG CIVITAI_DOWNLOADER_VERSION
 RUN /install_civitai_model_downloader.sh
 
 # Cleanup installation scripts from root directory only (keep them in /build/)
-RUN rm -f /install_*.sh /comm-models-download.sh /install_civitai_model_downloader.sh /requirements.txt
+RUN rm -f /install*.sh /comm-models-download.sh /install_civitai_model_downloader.sh /requirements.txt
 
 # Remove existing SSH host keys
 RUN rm -f /etc/ssh/ssh_host_*
